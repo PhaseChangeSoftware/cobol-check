@@ -33,7 +33,8 @@ stepLine : (GIVEN | WHEN | THEN | AND | BUT) other? ;
 ruleLine : RULE COLON other? ;
 comment : POUND other? ;
 docStringSeparator : DOCSTRING other? ;
-descriptionHelper : EMPTY (description noline+)*? ;
+// needs to handle all forms of whitespace prior to the description
+descriptionHelper : (noline | EMPTY)* (description (noline | EMPTY)*)*? ;
 description : other ;
 
 other : (ANY | BACKGROUND | EXAMPLE | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO | SCENARIOS)
