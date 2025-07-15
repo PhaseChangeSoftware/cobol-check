@@ -4,6 +4,7 @@ plugins {
     id 'java-library'
     id 'org.sonarqube' version '3.0'
     id 'jacoco'
+    id 'antlr'
 }
 
 def productVersion = '0.2.19'
@@ -103,6 +104,8 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter-params:5.7.0')
     testImplementation 'org.mockito:mockito-inline:3.6.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
+    antlr 'org.antlr:antlr4:4.13.1'
+    implementation 'org.antlr:antlr4-runtime:4.13.1'
 }
 
 def unitTest = tasks.register("unitTest", Test) {
@@ -230,7 +233,6 @@ task defaultProperties {
     println "Group: $project.group"
     println "Description: $project.description"
 }
-
 task osInfo {
     description 'Show information about the operating system'
     doLast {
