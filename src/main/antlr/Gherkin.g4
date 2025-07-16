@@ -4,25 +4,24 @@ gherkinDocument : feature? EMPTY*? EOF ;
 
 noline : (comment EMPTY | EMPTY)+? ;
 feature : noline* featureHeader (EMPTY background)? (EMPTY scenarioDefinition)* (EMPTY rule)* ;
-featureHeader : (LANGUAGE EMPTY)? tags? featureLine descriptionHelper? ;
+featureHeader : (languageLine EMPTY)? tags? featureLine descriptionHelper ;
 
 rule : noline* ruleHeader background? scenarioDefinition* ;
-ruleHeader : tags? ruleLine descriptionHelper? ;
+ruleHeader : tags? ruleLine descriptionHelper ;
 
-background : noline* backGroundLine descriptionHelper? step* ;
+background : noline* backGroundLine descriptionHelper step* ;
 
 scenarioDefinition : noline* tags? scenario ;
-scenario : scenarioLine descriptionHelper? (step (EMPTY step)*)* examplesDefinition? ;
-examplesDefinition : noline* examplesLine (EMPTY tags)? descriptionHelper examplesTable ;
+scenario : scenarioLine descriptionHelper (step (EMPTY step)*)* examplesDefinition* ;
+examplesDefinition : noline tags? examplesLine descriptionHelper examplesTable ;
 examplesTable : TABLEROW (EMPTY TABLEROW)* ;
 
-step : stepLine (EMPTY stepArg)? ;
+step : noline* stepLine (EMPTY stepArg)? ;
 stepArg : (dataTable | docString) ;
 
 dataTable : noline* TABLEROW (noline+ TABLEROW)* ;
-docString : docStringSeparator EMPTY (other EMPTY)* docStringSeparator ;
-
-tags : TAGLINE (EMPTY TAGLINE)* ;
+docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
+tags : noline* tagline (noline+ tagline)* noline+ ;
 
 
 scenarioLine :  (SCENARIO | EXAMPLE) (OUTLINE)? COLON other? ;
@@ -32,19 +31,19 @@ backGroundLine : BACKGROUND COLON other? ;
 stepLine : (GIVEN | WHEN | THEN | AND | BUT) other? ;
 ruleLine : RULE COLON other? ;
 comment : POUND other? ;
-docStringSeparator : DOCSTRING other? ;
 // needs to handle all forms of whitespace prior to the description
 descriptionHelper : noline? (description (noline | EMPTY)*)*? ;
 description : other ;
+languageLine : '#' LANGUAGE ':' ANY ;
 
 other : (ANY | BACKGROUND | EXAMPLE | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO | SCENARIOS)
-(ANY | AND | BACKGROUND | BUT | EXAMPLE | EXAMPLES | FEATURE | GIVEN | OUTLINE | RULE |
-  SCENARIO | SCENARIOS | THEN | WHEN | COLON)*;
+(ATSIGN | ANY | AND | BACKGROUND | BUT | EXAMPLE | EXAMPLES | FEATURE | GIVEN | OUTLINE | RULE |
+  SCENARIO | SCENARIOS | TAG | THEN | WHEN | COLON)*;
+tagline : TAG+;
 
-TABLEROW : WS? ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|');
-TAGLINE : WS? AT ANY* EMPTY ;
-
-
+//Lexer rules
+TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|');
+TAG: AT (ANY | '#')+ ;
 AND : A N D ;
 BACKGROUND : B A C K G R O U N D ;
 BUT : B U T ;
@@ -52,6 +51,7 @@ EXAMPLE : E X A M P L E ;
 EXAMPLES : E X A M P L E S ;
 FEATURE : F E A T U R E ;
 GIVEN : G I V E N ;
+LANGUAGE : L A N G U A G E ;
 OUTLINE : O U T L I N E ;
 RULE : R U L E ;
 SCENARIO : S C E N A R I O ;
@@ -59,14 +59,22 @@ SCENARIOS : S C E N A R I O S ;
 THEN : T H E N ;
 WHEN : W H E N ;
 
-LANGUAGE : WS? '#' WS? L A N G U A G E WS? ':'[a-zA-Z- ]+ ;
 EMPTY : ENDLINE ;
-WS : [ \t]+ -> channel(HIDDEN);
 
-DOCSTRING :  ('"""' | '\'\'\'') ;
+fragment DOCSTRINGSEP1 : '"""' ;
+fragment ESCAPE1 : '\\"\\"\\"';
+DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
+fragment DOCSTRINGSEP2 : '\'\'\'' ;
+fragment ESCAPE2 : '\\\'\\\'\\\'';
+DOCSTRING2 : WS? DOCSTRINGSEP2 ANY? WS? EMPTY (ESCAPE2 | ~['\\])*? EMPTY WS? DOCSTRINGSEP2;
+fragment DOCSTRINGSEP3 : '```' ;
+fragment ESCAPE3 : '\\`\\`\\`';
+DOCSTRING3 : WS? DOCSTRINGSEP3 ANY? WS? EMPTY (ESCAPE3 | ~['\\])*? EMPTY WS? DOCSTRINGSEP3;
 POUND : '#' ;
 COLON : ':' ;
-ANY: ~[ #:\t\n\r]+ ;
+ATSIGN : '@' ;
+WS : [ \t]+ -> channel(HIDDEN);
+ANY: ~[ @#:\t\n\r]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');
