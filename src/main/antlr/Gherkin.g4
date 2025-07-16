@@ -13,8 +13,7 @@ background : noline* backGroundLine descriptionHelper step* ;
 
 scenarioDefinition : noline* tags? scenario ;
 scenario : scenarioLine descriptionHelper (step (EMPTY step)*)* examplesDefinition* ;
-examplesDefinition : noline tags? examplesLine descriptionHelper examplesTable ;
-examplesTable : TABLEROW (EMPTY TABLEROW)* ;
+examplesDefinition : noline tags? examplesLine descriptionHelper dataTable ;
 
 step : noline* stepLine (EMPTY stepArg)? ;
 stepArg : (dataTable | docString) ;
@@ -28,7 +27,7 @@ scenarioLine :  (SCENARIO | EXAMPLE) (OUTLINE)? COLON other? ;
 examplesLine :  (SCENARIOS | EXAMPLES) COLON other? ;
 featureLine : FEATURE COLON other? ;
 backGroundLine : BACKGROUND COLON other? ;
-stepLine : (GIVEN | WHEN | THEN | AND | BUT) other? ;
+stepLine : (GIVEN | WHEN | THEN | AND | BUT | STAR) other? ;
 ruleLine : RULE COLON other? ;
 comment : POUND other? ;
 // needs to handle all forms of whitespace prior to the description
@@ -38,12 +37,13 @@ languageLine : '#' LANGUAGE ':' ANY ;
 
 other : (ANY | BACKGROUND | EXAMPLE | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO | SCENARIOS)
 (ATSIGN | ANY | AND | BACKGROUND | BUT | EXAMPLE | EXAMPLES | FEATURE | GIVEN | OUTLINE | RULE |
-  SCENARIO | SCENARIOS | TAG | THEN | WHEN | COLON)*;
+  SCENARIO | SCENARIOS | STAR | TAG | THEN | WHEN | COLON)*;
 tagline : TAG+;
 
 //Lexer rules
-TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|');
+TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[|\r\n])*;
 TAG: AT (ANY | '#')+ ;
+STAR : '*' ;
 AND : A N D ;
 BACKGROUND : B A C K G R O U N D ;
 BUT : B U T ;
