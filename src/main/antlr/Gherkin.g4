@@ -49,7 +49,7 @@ anything: (ANY | AND | BUT | GIVEN | LANGUAGE | STAR | TAG | THEN | WHEN)
 tagline : TAG+;
 
 //Lexer rules
-TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[|\r\n])*;
+TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
 AND : A N D ;
