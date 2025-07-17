@@ -13,6 +13,7 @@ background : noline* backGroundLine descriptionHelper step* ;
 
 scenarioDefinition : noline* tags? scenario ;
 scenario : scenarioLine descriptionHelper (step (EMPTY step)*)* examplesDefinition* ;
+
 examplesDefinition : noline tags? examplesLine descriptionHelper dataTable ;
 
 step : noline* stepLine (EMPTY stepArg)? ;
