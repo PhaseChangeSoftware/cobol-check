@@ -35,9 +35,13 @@ descriptionHelper : noline? (description (noline | EMPTY)*)*? ;
 description : other ;
 languageLine : '#' LANGUAGE ':' ANY ;
 
-other : (ANY | BACKGROUND | EXAMPLE | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO | SCENARIOS)
-(ATSIGN | ANY | AND | BACKGROUND | BUT | EXAMPLE | EXAMPLES | FEATURE | GIVEN | OUTLINE | RULE |
-  SCENARIO | SCENARIOS | STAR | TAG | THEN | WHEN | COLON)*;
+keyword : BACKGROUND | EXAMPLE | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO | SCENARIOS ;
+other : ((ANY | keyword)
+    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | keyword)
+    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*) |
+  (ANY (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*) |
+  keyword;
+
 tagline : TAG+;
 
 //Lexer rules
