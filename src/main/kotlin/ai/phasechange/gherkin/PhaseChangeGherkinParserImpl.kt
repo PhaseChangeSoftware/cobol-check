@@ -30,4 +30,8 @@ class PhaseChangeGherkinParserImpl() {
         val ctx = parser.startRule()
 
     }
+
+    fun errors(): List<String> {
+        return errorListener.messages
+    }
 }

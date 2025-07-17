@@ -10,7 +10,6 @@ import java.nio.file.Paths
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 private val log = KotlinLogging.logger {}
@@ -21,8 +20,12 @@ class GherkinParserTest {
     fun test(file: Path) {
         assertNotNull(file)
         val contents = file.toFile().readText()
-        PhaseChangeGherkinParserImpl().parse(contents)
+        val parser = PhaseChangeGherkinParserImpl()
+        parser.parse(contents)
         println(contents)
+        assert( parser.errors().isEmpty()) {
+            "Syntax errors:${parser.errors().joinToString("\n")}"
+        }
         //assertEquals(expected, output);
     }
 
