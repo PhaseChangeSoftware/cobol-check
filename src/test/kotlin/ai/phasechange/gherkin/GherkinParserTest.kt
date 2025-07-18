@@ -21,8 +21,15 @@ class GherkinParserTest {
     fun test(file: Path) {
         assertNotNull(file)
         val contents = file.toFile().readText()
-        PhaseChangeGherkinParserImpl().parse(contents)
+        val parser = PhaseChangeGherkinParserImpl()
+        val tokens = parser.parse(contents)
+        /*tokens.tokens.forEach {
+            println(it)
+        }*/
         println(contents)
+        assert( parser.errors().isEmpty()) {
+            "Syntax errors:${parser.errors().joinToString("\n")}"
+        }
         //assertEquals(expected, output);
     }
 

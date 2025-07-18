@@ -1,14 +1,44 @@
 package ai.phasechange.gherkin
 
-import GherkinLexer
+import GherkinLexerem
+import GherkinLexeren
+import GherkinLexerfr
+import GherkinLexerht
+import GherkinLexerlol
+import GherkinLexerno
 import GherkinParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.Lexer
 
 class PhaseChangeGherkinParserImpl() {
     private val errorListener = AntlrParserAccumulatingErrorListener()
-    fun parse(fileText: String) {
-        val lexer = GherkinLexer(CharStreams.fromString(fileText))
+    private fun getLexer(fileText: String): Lexer {
+        val stream = CharStreams.fromString(fileText)
+        val startLine = fileText.trimStart().substringBefore("\n")
+        if (startLine.startsWith("#") && startLine.lowercase().contains("language")) {
+            when {
+                startLine.endsWith("ht") ->
+                    return GherkinLexerht(stream)
+
+                startLine.endsWith("em") ->
+                    return GherkinLexerem(stream)
+
+                startLine.endsWith("no") ->
+                    return GherkinLexerno(stream)
+
+                startLine.endsWith("en-lol") ->
+                    return GherkinLexerlol(stream)
+
+                startLine.endsWith("fr") ->
+                    return GherkinLexerfr(stream)
+            }
+        }
+        return GherkinLexeren(stream)
+    }
+
+    fun parse(fileText: String): CommonTokenStream {
+        val lexer = getLexer(fileText)
 
         // register an error listener, so that preprocessing stops on errors
         lexer.removeErrorListeners()
@@ -28,6 +58,10 @@ class PhaseChangeGherkinParserImpl() {
         errorListener.reset()
         // specify our entry point
         val ctx = parser.startRule()
+        return tokens
+    }
 
+    fun errors(): List<String> {
+        return errorListener.messages
     }
 }
