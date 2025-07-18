@@ -13,16 +13,15 @@ tokens {
   WHEN
 }
 //Lexer rules
+//note: These must appear in this order, and any additional needed must be added at the end of the file
 KARAKTERISTIK: K A R A K T E R I S T I K -> type(FEATURE);
 MAK: M A K -> type(FEATURE);
 FONKSYONALITE: F O N K S Y O N A L I T E -> type(FEATURE);
 KONTEKS: K O N T EGRAVE K S -> type(BACKGROUND);
 SENARYO: S E N A R Y O -> type(SCENARIO);
-PLAN: P L A N ;
-DYAGRAM: D Y A G R A M ;
+RULEHT: R U L E -> type(RULE) ;
 OUTLINEHT: (PLAN | DYAGRAM) WS SENARYO -> type(OUTLINE);
 OUTTWOHT: SENARYO WS DESKRIPSYON -> type(OUTLINE);
-DESKRIPSYON: D E S K R I P S Y O N;
 EGZANP: E G Z A N P -> type(EXAMPLES);
 SIPOZE: S I P O Z E WS? K? E? -> type(GIVEN);
 LE: L (E | EGRAVE) -> type(WHEN);
@@ -84,3 +83,8 @@ fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 fragment ENDLINE:('\n' | '\r');
 
+// These have to come at the end so they don't upset the token order. This makes this file
+// interchangable with all the other files.
+DESKRIPSYON: D E S K R I P S Y O N;
+DYAGRAM: D Y A G R A M ;
+PLAN: P L A N ;
