@@ -13,6 +13,11 @@ tokens {
   WHEN
 }
 //Lexer rules
+// These have to be fragments to keep from disturbing the token order
+fragment DESKRIPSYON: D E S K R I P S Y O N;
+fragment DYAGRAM: D Y A G R A M ;
+fragment PLAN: P L A N ;
+
 //note: These must appear in this order, and any additional needed must be added at the end of the file
 KARAKTERISTIK: K A R A K T E R I S T I K -> type(FEATURE);
 MAK: M A K -> type(FEATURE);
@@ -82,9 +87,3 @@ fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 fragment ENDLINE:('\n' | '\r');
-
-// These have to come at the end so they don't upset the token order. This makes this file
-// interchangable with all the other files.
-DESKRIPSYON: D E S K R I P S Y O N;
-DYAGRAM: D Y A G R A M ;
-PLAN: P L A N ;
