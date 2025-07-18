@@ -1,4 +1,4 @@
-lexer grammar GherkinLexeren;
+lexer grammar GherkinLexerno;
 tokens {
   AND,
   BACKGROUND,
@@ -13,20 +13,19 @@ tokens {
   WHEN
 }
 //Lexer rules
-ANDEN : A N D -> type(AND);
-BACKGROUNDEN : B A C K G R O U N D -> type(BACKGROUND) ;
-BUTEN : B U T -> type(BUT);
-FEATUREEN: F E A T U R E -> type(FEATURE);
-EXAMPLE : E X A M P L E -> type(SCENARIO);
-EXAMPLESEN : E X A M P L E S -> type(EXAMPLES);
-GIVENEN : G I V E N -> type(GIVEN);
-OUTLINEEN : S C E N A R I O WS O U T L I N E -> type(OUTLINE);
-RULEEN : R U L E -> type(RULE);
-SCENARIOEN : S C E N A R I O -> type(SCENARIO) ;
-SCENARIOS : S C E N A R I O S -> type(EXAMPLES);
-TEMPLATE: S C E N A R I O WS T E M P L A T E -> type(OUTLINE);
-THENEN : T H E N -> type(THEN);
-WHENEN : W H E N -> type(WHEN);
+ANDNO : O G -> type(AND);
+BACKGROUNDNO : B A K G R U N N -> type(BACKGROUND) ;
+BUTNO : M E N -> type(BUT);
+FEATURENO: E G E N S K A P -> type(FEATURE);
+EXAMPLE : E K S E M P E L -> type(SCENARIO);
+EXAMPLESNO : E K S E M P L E R -> type(EXAMPLES);
+GIVENNO : G I T T -> type(GIVEN);
+OUTLINENO : A B S T R A K T WS S C E N A R I O -> type(OUTLINE);
+RULENO : R E G E L -> type(RULE);
+SCENARIONO : S C E N A R I O -> type(SCENARIO) ;
+TEMPLATENO : S C E N A R I O M A L -> type(OUTLINE);
+THENNO : S ANG -> type(THEN);
+WHENNO : N ANG R -> type(WHEN);
 
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
@@ -52,6 +51,7 @@ ANY: ~[ @#:\t\n\r]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');
+fragment ANG : ('å' | 'Å');
 fragment B:('b'|'B');
 fragment C:('c'|'C');
 fragment D:('d'|'D');

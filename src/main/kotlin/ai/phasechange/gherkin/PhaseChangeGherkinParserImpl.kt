@@ -2,7 +2,10 @@ package ai.phasechange.gherkin
 
 import GherkinLexerem
 import GherkinLexeren
+import GherkinLexerfr
 import GherkinLexerht
+import GherkinLexerlol
+import GherkinLexerno
 import GherkinParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -21,6 +24,14 @@ class PhaseChangeGherkinParserImpl() {
                 startLine.endsWith("em") ->
                     return GherkinLexerem(stream)
 
+                startLine.endsWith("no") ->
+                    return GherkinLexerno(stream)
+
+                startLine.endsWith("en-lol") ->
+                    return GherkinLexerlol(stream)
+
+                startLine.endsWith("fr") ->
+                    return GherkinLexerfr(stream)
             }
         }
         return GherkinLexeren(stream)
