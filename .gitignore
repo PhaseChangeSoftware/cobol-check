@@ -1,4 +1,5 @@
 # Cobol- and cobol-check-related gitignore entries
+.kotlin/
 *~
 *.lock
 *.DS_Store
