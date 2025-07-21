@@ -1,4 +1,8 @@
-lexer grammar GherkinLexerem;
+lexer grammar GherkinLexeren;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -13,25 +17,26 @@ tokens {
   WHEN
 }
 //Lexer rules
-AND : '😂' -> type(AND) ;
-BACKGROUNDEM : '💤' -> type(BACKGROUND) ;
-BUTEM : '😔' -> type(BUT);
-FEATUREEM: '📚' -> type(FEATURE);
-EXAMPLEEM : '📕' -> type(SCENARIO);
-EXAMPLESEM : '📓' -> type(EXAMPLES);
-GIVENEM : '😐' -> type(GIVEN);
-OUTLINEEM : '📖' -> type(OUTLINE);
-RULEEM : R U L E -> type(RULE);
-SCENARIOEM : '🥒' -> type(SCENARIO) ;
-THENEM : '🙏' -> type(THEN);
-WHENEM : '🎬' -> type(WHEN);
+ANDEN : A N D -> type(AND);
+BACKGROUNDEN : B A C K G R O U N D -> type(BACKGROUND) ;
+BUTEN : B U T -> type(BUT);
+FEATUREEN: F E A T U R E -> type(FEATURE);
+EXAMPLE : E X A M P L E -> type(SCENARIO);
+EXAMPLESEN : E X A M P L E S -> type(EXAMPLES);
+GIVENEN : G I V E N -> type(GIVEN);
+OUTLINEEN : S C E N A R I O WS O U T L I N E -> type(OUTLINE);
+RULEEN : R U L E -> type(RULE);
+SCENARIOEN : S C E N A R I O -> type(SCENARIO) ;
+SCENARIOS : S C E N A R I O S -> type(EXAMPLES);
+TEMPLATE: S C E N A R I O WS T E M P L A T E -> type(OUTLINE);
+THENEN : T H E N -> type(THEN);
+WHENEN : W H E N -> type(WHEN);
 
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
-
+VARIABLE : '<' ANY '>' ;
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
 DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
@@ -46,7 +51,7 @@ COLON : ':' ;
 ATSIGN : '@' ;
 WS : [ \t]+ -> channel(HIDDEN);
 COMMENT : POUND ~[\r\n]* -> channel(HIDDEN);
-ANY: ~[ @#:\t\n\r]+ ;
+ANY: ~[ @#:\t\n\r<>]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');

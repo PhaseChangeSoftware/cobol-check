@@ -21,6 +21,9 @@ envvars
 target/
 src/test/cobol/TESTPRG.CBL
 *.so
+src/main/gen
+src/main/antlr/ai/phasechange/gherkin/gen/
+src/main/antlr/ai/phasechange/gherkin/*.tokens
 
 # Windows specific
 
