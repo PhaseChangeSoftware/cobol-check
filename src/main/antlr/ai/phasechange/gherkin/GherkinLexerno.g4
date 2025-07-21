@@ -1,4 +1,8 @@
 lexer grammar GherkinLexerno;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -30,24 +34,24 @@ WHENNO : N ANG R -> type(WHEN);
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
-
+LT : '<' ;
+GT : '>' ;
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
-DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
+DOCSTRING1 : WS? DOCSTRINGSEP1 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
 fragment DOCSTRINGSEP2 : '\'\'\'' ;
 fragment ESCAPE2 : '\\\'\\\'\\\'';
-DOCSTRING2 : WS? DOCSTRINGSEP2 ANY? WS? EMPTY (ESCAPE2 | ~['\\])*? EMPTY WS? DOCSTRINGSEP2;
+DOCSTRING2 : WS? DOCSTRINGSEP2 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE2 | ~['\\])*? EMPTY WS? DOCSTRINGSEP2;
 fragment DOCSTRINGSEP3 : '```' ;
 fragment ESCAPE3 : '\\`\\`\\`';
-DOCSTRING3 : WS? DOCSTRINGSEP3 ANY? WS? EMPTY (ESCAPE3 | ~['\\])*? EMPTY WS? DOCSTRINGSEP3;
+DOCSTRING3 : WS? DOCSTRINGSEP3 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE3 | ~['\\])*? EMPTY WS? DOCSTRINGSEP3;
 POUND : '#' ;
 COLON : ':' ;
 ATSIGN : '@' ;
 WS : [ \t]+ -> channel(HIDDEN);
 COMMENT : POUND ~[\r\n]* -> channel(HIDDEN);
-ANY: ~[ @#:\t\n\r]+ ;
+ANY: ~[ @#:\t\n\r<>]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');

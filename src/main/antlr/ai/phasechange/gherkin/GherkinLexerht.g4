@@ -1,4 +1,8 @@
 lexer grammar GherkinLexerht;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -39,9 +43,9 @@ MEN: M E N -> type(BUT);
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
-
+LT : '<' ;
+GT : '>' ;
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
 DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
@@ -56,7 +60,7 @@ COLON : ':' ;
 ATSIGN : '@' ;
 WS : [ \t]+ -> channel(HIDDEN);
 COMMENT : POUND ~[\r\n]* -> channel(HIDDEN);
-ANY: ~[ @#:\t\n\r]+ ;
+ANY: ~[ @#:\t\n\r<>]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');

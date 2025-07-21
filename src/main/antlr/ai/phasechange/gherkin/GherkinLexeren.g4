@@ -1,4 +1,8 @@
-lexer grammar GherkinLexerlol;
+lexer grammar GherkinLexeren;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -13,39 +17,42 @@ tokens {
   WHEN
 }
 //Lexer rules
-ANDEN : A N -> type(AND);
-BACKGROUNDEN : B '4' -> type(BACKGROUND) ;
+ANDEN : A N D -> type(AND);
+BACKGROUNDEN : B A C K G R O U N D -> type(BACKGROUND) ;
 BUTEN : B U T -> type(BUT);
-FEATUREEN: O H WS H A I -> type(FEATURE);
-EXAMPLESEN : E X A M P L Z -> type(EXAMPLES);
-GIVENEN : I WS C A N WS H A Z -> type(GIVEN);
-OUTLINEEN : M I S H U N WS S R S L Y -> type(OUTLINE);
+FEATUREEN: F E A T U R E -> type(FEATURE);
+EXAMPLE : E X A M P L E -> type(SCENARIO);
+EXAMPLESEN : E X A M P L E S -> type(EXAMPLES);
+GIVENEN : G I V E N -> type(GIVEN);
+OUTLINEEN : S C E N A R I O WS O U T L I N E -> type(OUTLINE);
 RULEEN : R U L E -> type(RULE);
-SCENARIOEN : M I S H U N -> type(SCENARIO) ;
-THENEN : D E N -> type(THEN);
-WHENNO : W E N -> type(WHEN);
+SCENARIOEN : S C E N A R I O -> type(SCENARIO) ;
+SCENARIOS : S C E N A R I O S -> type(EXAMPLES);
+TEMPLATE: S C E N A R I O WS T E M P L A T E -> type(OUTLINE);
+THENEN : T H E N -> type(THEN);
+WHENEN : W H E N -> type(WHEN);
 
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
-
+LT : '<' ;
+GT : '>' ;
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
-DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
+DOCSTRING1 : WS? DOCSTRINGSEP1 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
 fragment DOCSTRINGSEP2 : '\'\'\'' ;
 fragment ESCAPE2 : '\\\'\\\'\\\'';
-DOCSTRING2 : WS? DOCSTRINGSEP2 ANY? WS? EMPTY (ESCAPE2 | ~['\\])*? EMPTY WS? DOCSTRINGSEP2;
+DOCSTRING2 : WS? DOCSTRINGSEP2 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE2 | ~['\\])*? EMPTY WS? DOCSTRINGSEP2;
 fragment DOCSTRINGSEP3 : '```' ;
 fragment ESCAPE3 : '\\`\\`\\`';
-DOCSTRING3 : WS? DOCSTRINGSEP3 ANY? WS? EMPTY (ESCAPE3 | ~['\\])*? EMPTY WS? DOCSTRINGSEP3;
+DOCSTRING3 : WS? DOCSTRINGSEP3 (LT ANY GT)? ANY? WS? EMPTY (ESCAPE3 | ~['\\])*? EMPTY WS? DOCSTRINGSEP3;
 POUND : '#' ;
 COLON : ':' ;
 ATSIGN : '@' ;
 WS : [ \t]+ -> channel(HIDDEN);
 COMMENT : POUND ~[\r\n]* -> channel(HIDDEN);
-ANY: ~[ @#:\t\n\r]+ ;
+ANY: ~[ @#:\t\n\r<>]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');
@@ -53,6 +60,7 @@ fragment B:('b'|'B');
 fragment C:('c'|'C');
 fragment D:('d'|'D');
 fragment E:('e'|'E');
+fragment EGRAVE: ('è' | 'È');
 fragment F:('f'|'F');
 fragment G:('g'|'G');
 fragment H:('h'|'H');
