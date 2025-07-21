@@ -31,7 +31,7 @@ WHENEN : W H E N -> type(WHEN);
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
-
+VARIABLE : '<' ANY '>' ;
 EMPTY : ENDLINE ;
 LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
@@ -48,7 +48,7 @@ COLON : ':' ;
 ATSIGN : '@' ;
 WS : [ \t]+ -> channel(HIDDEN);
 COMMENT : POUND ~[\r\n]* -> channel(HIDDEN);
-ANY: ~[ @#:\t\n\r]+ ;
+ANY: ~[ @#:\t\n\r<>]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');

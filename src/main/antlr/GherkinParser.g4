@@ -14,32 +14,36 @@ ruleHeader : tags? ruleLine descriptionHelper ;
 
 background : noline* backGroundLine descriptionHelper step* ;
 
-scenarioDefinition : noline* tags? scenario ;
-scenario : scenarioLine descriptionHelper (step (EMPTY step)*)* examplesDefinition* ;
-
+scenarioDefinition : noline* tags? (scenario | scenarioOutline) ;
+scenario : scenarioLine descriptionHelper (step (EMPTY step)*)*;
+scenarioOutline: scenarioOutlineLine outlineDescriptionHelper (outlineStep (EMPTY outlineStep)*)*  examplesDefinition+ ;
 examplesDefinition : noline* tags? examplesLine descriptionHelper dataTable? ;
 
 step : noline* stepLine (EMPTY stepArg)? ;
 stepArg : (dataTable | docString) ;
+outlineStep : noline* outlineStepLine (EMPTY stepArg) ;
 
 dataTable : noline* TABLEROW (noline+ TABLEROW)* ;
 docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
 tags : noline* tagline (noline+ tagline)* noline+ ;
 
-
-scenarioLine :  (SCENARIO | OUTLINE)? COLON other? ;
+scenarioOutlineLine: OUTLINE COLON other? ;
+scenarioLine :  (SCENARIO)? COLON other? ;
 examplesLine :  EXAMPLES COLON other? ;
 featureLine : FEATURE COLON other? ;
 backGroundLine : BACKGROUND COLON other? ;
 stepLine : (GIVEN | WHEN | THEN | AND | BUT | STAR) other? ;
+outlineStepLine : (GIVEN | WHEN | THEN | AND | BUT | STAR) parameterizedText? ;
 ruleLine : RULE COLON other? ;
 // needs to handle all forms of whitespace prior to the description
 descriptionHelper : noline? (description noline+)* ;
+outlineDescriptionHelper: noline? (parameterizedText noline+)* ;
 description : other ;
 languageLine : POUND LANGUAGE COLON ANY ;
 featureDescHelper : noline? (featureDesc noline+)* ;
 featureDesc : anything ;
 
+parameterizedText : VARIABLE | other ;
 keyword : BACKGROUND | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO ;
 other : ((ANY | keyword)
     (ATSIGN | ANY | AND | BUT | GIVEN | LANGUAGE | STAR | TAG | THEN | WHEN | keyword)
