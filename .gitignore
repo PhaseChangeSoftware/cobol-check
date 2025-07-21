@@ -1,5 +1,7 @@
 # Cobol- and cobol-check-related gitignore entries
 .kotlin/
+src/main/gen
+src/main/antlr/gen
 *~
 *.lock
 *.DS_Store
