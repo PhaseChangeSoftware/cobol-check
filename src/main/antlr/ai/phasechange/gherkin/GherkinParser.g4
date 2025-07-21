@@ -17,6 +17,8 @@ WHEN,
 TABLEROW,
 TAG,
 STAR,
+LT,
+GT,
 EMPTY,
 DOCSTRING1,
 DOCSTRING2,
@@ -28,6 +30,7 @@ WS,
 COMMENT,
 ANY
 }
+
 startRule : gherkinDocument;
 gherkinDocument : feature? EMPTY*? EOF ;
 
@@ -40,14 +43,12 @@ ruleHeader : tags? ruleLine descriptionHelper ;
 
 background : noline* backGroundLine descriptionHelper step* ;
 
-scenarioDefinition : noline* tags? (scenario | scenarioOutline) ;
-scenario : scenarioLine descriptionHelper (step (EMPTY step)*)*;
-scenarioOutline: scenarioOutlineLine outlineDescriptionHelper (outlineStep (EMPTY outlineStep)*)*  examplesDefinition+ ;
+scenarioDefinition : noline* tags? scenario ;
+scenario : (scenarioLine | scenarioOutlineLine)  descriptionHelper (step (EMPTY step)*)* examplesDefinition*;
 examplesDefinition : noline* tags? examplesLine descriptionHelper dataTable? ;
 
 step : noline* stepLine (EMPTY stepArg)? ;
 stepArg : (dataTable | docString) ;
-outlineStep : noline* outlineStepLine (EMPTY stepArg) ;
 
 dataTable : noline* TABLEROW (noline+ TABLEROW)* ;
 docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
@@ -59,22 +60,20 @@ examplesLine :  EXAMPLES COLON other? ;
 featureLine : FEATURE COLON other? ;
 backGroundLine : BACKGROUND COLON other? ;
 stepLine : (GIVEN | WHEN | THEN | AND | BUT | STAR) other? ;
-outlineStepLine : (GIVEN | WHEN | THEN | AND | BUT | STAR) parameterizedText? ;
 ruleLine : RULE COLON other? ;
 // needs to handle all forms of whitespace prior to the description
 descriptionHelper : noline? (description noline+)* ;
-outlineDescriptionHelper: noline? (parameterizedText noline+)* ;
 description : other ;
 featureDescHelper : noline? (featureDesc noline+)* ;
 featureDesc : anything ;
 
-parameterizedText : VARIABLE | other ;
+variable: (LT ANY GT) ;
 keyword : BACKGROUND | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO ;
-other : ((ANY | keyword)
-    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | keyword)
-    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*) |
-  (ANY (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*) |
-  keyword;
+other : ((ANY | variable |keyword )
+    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | variable |  keyword)
+    (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | variable | keyword)*) |
+  (ANY (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | variable | keyword)*) |
+  variable | keyword;
 
 anything: (ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN)
  (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*;
