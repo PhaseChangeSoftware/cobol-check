@@ -1,12 +1,5 @@
 package ai.phasechange.gherkin
 
-import GherkinLexerem
-import GherkinLexeren
-import GherkinLexerfr
-import GherkinLexerht
-import GherkinLexerlol
-import GherkinLexerno
-import GherkinParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Lexer

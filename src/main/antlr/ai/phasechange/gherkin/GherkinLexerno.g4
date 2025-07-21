@@ -1,4 +1,8 @@
-lexer grammar GherkinLexerlol;
+lexer grammar GherkinLexerno;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -13,24 +17,25 @@ tokens {
   WHEN
 }
 //Lexer rules
-ANDEN : A N -> type(AND);
-BACKGROUNDEN : B '4' -> type(BACKGROUND) ;
-BUTEN : B U T -> type(BUT);
-FEATUREEN: O H WS H A I -> type(FEATURE);
-EXAMPLESEN : E X A M P L Z -> type(EXAMPLES);
-GIVENEN : I WS C A N WS H A Z -> type(GIVEN);
-OUTLINEEN : M I S H U N WS S R S L Y -> type(OUTLINE);
-RULEEN : R U L E -> type(RULE);
-SCENARIOEN : M I S H U N -> type(SCENARIO) ;
-THENEN : D E N -> type(THEN);
-WHENNO : W E N -> type(WHEN);
+ANDNO : O G -> type(AND);
+BACKGROUNDNO : B A K G R U N N -> type(BACKGROUND) ;
+BUTNO : M E N -> type(BUT);
+FEATURENO: E G E N S K A P -> type(FEATURE);
+EXAMPLE : E K S E M P E L -> type(SCENARIO);
+EXAMPLESNO : E K S E M P L E R -> type(EXAMPLES);
+GIVENNO : G I T T -> type(GIVEN);
+OUTLINENO : A B S T R A K T WS S C E N A R I O -> type(OUTLINE);
+RULENO : R E G E L -> type(RULE);
+SCENARIONO : S C E N A R I O -> type(SCENARIO) ;
+TEMPLATENO : S C E N A R I O M A L -> type(OUTLINE);
+THENNO : S ANG -> type(THEN);
+WHENNO : N ANG R -> type(WHEN);
 
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
 
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
 DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
@@ -49,10 +54,12 @@ ANY: ~[ @#:\t\n\r]+ ;
 fragment AT: '@' ;
 // case insensitive chars
 fragment A:('a'|'A');
+fragment ANG : ('å' | 'Å');
 fragment B:('b'|'B');
 fragment C:('c'|'C');
 fragment D:('d'|'D');
 fragment E:('e'|'E');
+fragment EGRAVE: ('è' | 'È');
 fragment F:('f'|'F');
 fragment G:('g'|'G');
 fragment H:('h'|'H');

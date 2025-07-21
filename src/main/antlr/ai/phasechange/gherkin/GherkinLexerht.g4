@@ -1,4 +1,8 @@
-lexer grammar GherkinLexeren;
+lexer grammar GherkinLexerht;
+@header {
+  package ai.phasechange.gherkin;
+}
+
 tokens {
   AND,
   BACKGROUND,
@@ -13,27 +17,34 @@ tokens {
   WHEN
 }
 //Lexer rules
-ANDEN : A N D -> type(AND);
-BACKGROUNDEN : B A C K G R O U N D -> type(BACKGROUND) ;
-BUTEN : B U T -> type(BUT);
-FEATUREEN: F E A T U R E -> type(FEATURE);
-EXAMPLE : E X A M P L E -> type(SCENARIO);
-EXAMPLESEN : E X A M P L E S -> type(EXAMPLES);
-GIVENEN : G I V E N -> type(GIVEN);
-OUTLINEEN : S C E N A R I O WS O U T L I N E -> type(OUTLINE);
-RULEEN : R U L E -> type(RULE);
-SCENARIOEN : S C E N A R I O -> type(SCENARIO) ;
-SCENARIOS : S C E N A R I O S -> type(EXAMPLES);
-TEMPLATE: S C E N A R I O WS T E M P L A T E -> type(OUTLINE);
-THENEN : T H E N -> type(THEN);
-WHENEN : W H E N -> type(WHEN);
+// These have to be fragments to keep from disturbing the token order
+fragment DESKRIPSYON: D E S K R I P S Y O N;
+fragment DYAGRAM: D Y A G R A M ;
+fragment PLAN: P L A N ;
+
+//note: These must appear in this order, and any additional needed must be added at the end of the file
+KARAKTERISTIK: K A R A K T E R I S T I K -> type(FEATURE);
+MAK: M A K -> type(FEATURE);
+FONKSYONALITE: F O N K S Y O N A L I T E -> type(FEATURE);
+KONTEKS: K O N T EGRAVE K S -> type(BACKGROUND);
+SENARYO: S E N A R Y O -> type(SCENARIO);
+RULEHT: R U L E -> type(RULE) ;
+OUTLINEHT: (PLAN | DYAGRAM) WS SENARYO -> type(OUTLINE);
+OUTTWOHT: SENARYO WS DESKRIPSYON -> type(OUTLINE);
+EGZANP: E G Z A N P -> type(EXAMPLES);
+SIPOZE: S I P O Z E WS? K? E? -> type(GIVEN);
+LE: L (E | EGRAVE) -> type(WHEN);
+LESAA: L (E | EGRAVE) WS S A WS A -> type(THEN);
+AKEPIE: A K -> type(AND);
+EPI: E P I -> type(AND);
+EH: E -> type(AND);
+MEN: M E N -> type(BUT);
 
 TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
 TAG: AT (ANY | '#')+ ;
 STAR : '*' ;
 
 EMPTY : ENDLINE ;
-LANGUAGE : L A N G U A G E ;
 fragment DOCSTRINGSEP1 : '"""' ;
 fragment ESCAPE1 : '\\"\\"\\"';
 DOCSTRING1 : WS? DOCSTRINGSEP1 ANY? WS? EMPTY (ESCAPE1 | '"' | ~["\\])*? EMPTY WS? DOCSTRINGSEP1;
@@ -79,4 +90,3 @@ fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 fragment ENDLINE:('\n' | '\r');
-

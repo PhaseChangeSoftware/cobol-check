@@ -1,7 +1,5 @@
 # Cobol- and cobol-check-related gitignore entries
 .kotlin/
-src/main/gen
-src/main/antlr/gen
 *~
 *.lock
 *.DS_Store
@@ -23,6 +21,9 @@ envvars
 target/
 src/test/cobol/TESTPRG.CBL
 *.so
+src/main/gen
+src/main/antlr/ai/phasechange/gherkin/gen/
+src/main/antlr/ai/phasechange/gherkin/*.tokens
 
 # Windows specific
 
