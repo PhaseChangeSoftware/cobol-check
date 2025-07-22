@@ -1,5 +1,7 @@
 package ai.phasechange.gherkin
 
+import ai.phasechange.gherkin.ast.GherkinDocument
+import ai.phasechange.gherkin.ast.GherkinVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Lexer
@@ -30,7 +32,7 @@ class PhaseChangeGherkinParserImpl() {
         return GherkinLexeren(stream)
     }
 
-    fun parse(fileText: String): CommonTokenStream {
+    fun parse(fileText: String): GherkinDocument? {
         val lexer = getLexer(fileText)
 
         // register an error listener, so that preprocessing stops on errors
@@ -51,7 +53,8 @@ class PhaseChangeGherkinParserImpl() {
         errorListener.reset()
         // specify our entry point
         val ctx = parser.startRule()
-        return tokens
+        val visitor = GherkinVisitor()
+        return visitor.visitGherkinDocument(ctx.gherkinDocument())
     }
 
     fun errors(): List<String> {

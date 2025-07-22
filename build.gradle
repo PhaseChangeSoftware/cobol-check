@@ -82,6 +82,10 @@ sourceSets {
     }
 }
 
+generateGrammarSource {
+    arguments += ["-visitor"]
+}
+
 test {
     description 'Runs all tests'
     testLogging {

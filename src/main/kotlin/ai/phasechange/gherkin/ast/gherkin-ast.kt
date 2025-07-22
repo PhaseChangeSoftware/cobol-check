@@ -5,7 +5,7 @@ package ai.phasechange.gherkin.ast
  * gherkinDocument : feature? EMPTY*? EOF ;
  * ```
  */
-class GherkinDocument(val feature: GherkinFeature?)
+class GherkinDocument(val feature: GherkinFeature?) : AbstractGherkin()
 
 /**
  * ```
@@ -16,8 +16,8 @@ class GherkinFeature(
     val featureHeader: GherkinFeatureHeader,
     val background: GherkinBackground?,
     val scenarioDefinitions: List<GherkinScenarioDefinition>?,
-    val rules: List<GherkinRule>
-)
+    val rules: List<GherkinRule>?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -28,7 +28,7 @@ class GherkinFeatureHeader(
     val tags: GherkinTags?,
     val featureLine: GherkinFeatureLine,
     val featureDescHelper: GherkinFeatureDescHelper
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -39,7 +39,7 @@ class GherkinRule(
     val ruleHeader: GherkinRuleHeader,
     val background: GherkinBackground?,
     val scenarioDefinitions: List<GherkinScenarioDefinition>?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -50,7 +50,7 @@ class GherkinRuleHeader(
     val tags: GherkinTags?,
     val ruleLine: GherkinRuleLine,
     val descriptionHelper: GherkinDescriptionHelper
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -61,7 +61,7 @@ class GherkinBackground(
     val backgroundLine: GherkinBackgroundLine,
     val descriptionHelper: GherkinDescriptionHelper,
     val steps: List<GherkinStep>?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -71,7 +71,7 @@ class GherkinBackground(
 class GherkinScenarioDefinition(
     val tags: GherkinTags?,
     val scenario: GherkinScenario
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -81,9 +81,9 @@ class GherkinScenarioDefinition(
 class GherkinScenario(
     val scenarioLine: GherkinScenarioLine,
     val descriptionHelper: GherkinDescriptionHelper,
-    val steps: List<GherkinStep>,
+    val steps: List<GherkinStep>?,
     val examplesDefinitions: List<GherkinExamplesDefinition>?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -95,7 +95,7 @@ class GherkinExamplesDefinition(
     val examplesLine: GherkinExamplesLine,
     val descriptionHelper: GherkinDescriptionHelper,
     val dataTable: GherkinDataTable?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -104,8 +104,8 @@ class GherkinExamplesDefinition(
  */
 class GherkinStep(
     val stepLine: GherkinStepLine,
-    val stepArgs: List<GherkinStepArg>?
-)
+    val stepArg: GherkinStepArg?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -115,7 +115,7 @@ class GherkinStep(
 class GherkinStepArg(
     val dataTable: GherkinDataTable?,
     val docString: GherkinDocString?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -124,14 +124,14 @@ class GherkinStepArg(
  */
 class GherkinDataTable(
     val tableRows: List<String>
-)
+) : AbstractGherkin()
 
 /**
  * ```
  * docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
  * ```
  */
-class GherkinDocString(val docString: String)
+class GherkinDocString(val docString: String) : AbstractGherkin()
 
 /**
  * ```
@@ -140,7 +140,7 @@ class GherkinDocString(val docString: String)
  */
 class GherkinTags(
     val taglines: List<GherkinTagline>
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -149,8 +149,8 @@ class GherkinTags(
  */
 class GherkinScenarioLine(
     val outline: Boolean,
-    val other: GherkinOther
-)
+    val other: GherkinOther?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -158,8 +158,8 @@ class GherkinScenarioLine(
  * ```
  */
 class GherkinExamplesLine(
-    val other: GherkinOther
-)
+    val other: GherkinOther?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -167,8 +167,8 @@ class GherkinExamplesLine(
  * ```
  */
 class GherkinFeatureLine(
-    val other: GherkinOther
-)
+    val other: GherkinOther?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -176,8 +176,8 @@ class GherkinFeatureLine(
  * ```
  */
 class GherkinBackgroundLine(
-    val other: GherkinOther
-)
+    val other: GherkinOther?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -186,8 +186,8 @@ class GherkinBackgroundLine(
  */
 class GherkinStepLine(
     val type: Type,
-    val other: GherkinOther
-) {
+    val other: GherkinOther?
+) : AbstractGherkin() {
     enum class Type {
         GIVEN,
         WHEN,
@@ -204,8 +204,8 @@ class GherkinStepLine(
  * ```
  */
 class GherkinRuleLine(
-    val other: GherkinOther
-)
+    val other: GherkinOther?
+) : AbstractGherkin()
 
 // needs to handle all forms of whitespace prior to the description
 /**
@@ -214,8 +214,8 @@ class GherkinRuleLine(
  * ```
  */
 class GherkinDescriptionHelper(
-    val descriptions: List<GherkinDescription>
-)
+    val descriptions: List<GherkinDescription>?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -224,7 +224,7 @@ class GherkinDescriptionHelper(
  */
 class GherkinDescription(
     val other: GherkinOther
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -233,7 +233,7 @@ class GherkinDescription(
  */
 class GherkinFeatureDescHelper(
     val featureDescs: List<GherkinFeatureDesc>?
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -242,7 +242,7 @@ class GherkinFeatureDescHelper(
  */
 class GherkinFeatureDesc(
     val featureDesc: GherkinAnything
-)
+) : AbstractGherkin()
 
 /**
  * ```
@@ -251,7 +251,7 @@ class GherkinFeatureDesc(
  */
 class GherkinKeyword(
     val type: Type
-) {
+) : AbstractGherkin() {
     enum class Type {
         BACKGROUND,
         EXAMPLES,
@@ -272,8 +272,9 @@ class GherkinKeyword(
  * ```
  */
 class GherkinOther(
-    val words: List<String>
-)
+    val name: String,
+    val variables: List<String>?
+) : AbstractGherkin()
 
 /**
  * ```
@@ -282,8 +283,8 @@ class GherkinOther(
  * ```
  */
 class GherkinAnything(
-    val words: List<String>
-)
+    val description: String
+) : AbstractGherkin()
 
 /**
  * ```
@@ -291,5 +292,14 @@ class GherkinAnything(
  * ```
  */
 class GherkinTagline(
-    val tagline: GherkinTagline
-)
+    val tagline: List<GherkinTag>
+) : AbstractGherkin()
+
+/**
+ * ```
+ * TAG : TOKEN ;
+ * ```
+ */
+class GherkinTag(
+    val tag: String
+) : AbstractGherkin()
