@@ -44,7 +44,7 @@ ruleHeader : tags? ruleLine descriptionHelper ;
 background : noline* backGroundLine descriptionHelper step* ;
 
 scenarioDefinition : noline* tags? scenario ;
-scenario : (scenarioLine | scenarioOutlineLine)  descriptionHelper (step (EMPTY step)*)* examplesDefinition*;
+scenario : scenarioLine  descriptionHelper (step (EMPTY step)*)* examplesDefinition*;
 examplesDefinition : noline* tags? examplesLine descriptionHelper dataTable? ;
 
 step : noline* stepLine (EMPTY stepArg)? ;
@@ -54,8 +54,7 @@ dataTable : noline* TABLEROW (noline+ TABLEROW)* ;
 docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
 tags : noline* tagline (noline+ tagline)* noline+ ;
 
-scenarioOutlineLine: OUTLINE COLON other? ;
-scenarioLine :  (SCENARIO)? COLON other? ;
+scenarioLine :  (SCENARIO | OUTLINE) COLON other? ;
 examplesLine :  EXAMPLES COLON other? ;
 featureLine : FEATURE COLON other? ;
 backGroundLine : BACKGROUND COLON other? ;
@@ -67,7 +66,7 @@ description : other ;
 featureDescHelper : noline? (featureDesc noline+)* ;
 featureDesc : anything ;
 
-variable: (LT ANY GT) ;
+variable: LT ANY GT ;
 keyword : BACKGROUND | EXAMPLES | FEATURE | OUTLINE | RULE | SCENARIO ;
 other : ((ANY | variable |keyword )
     (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | variable |  keyword)
@@ -76,6 +75,6 @@ other : ((ANY | variable |keyword )
   variable | keyword;
 
 anything: (ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN)
- (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | keyword)*;
+ (ATSIGN | ANY | AND | BUT | GIVEN | STAR | TAG | THEN | WHEN | COLON | variable | keyword)*;
 tagline : TAG+;
 

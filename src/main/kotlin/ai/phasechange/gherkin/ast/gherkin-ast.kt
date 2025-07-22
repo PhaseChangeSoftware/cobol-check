@@ -139,7 +139,7 @@ class GherkinDocString(val docString: String)
  * ```
  */
 class GherkinTags(
-    val tagLines: List<GherkinTagline>
+    val taglines: List<GherkinTagline>
 )
 
 /**
@@ -148,7 +148,7 @@ class GherkinTags(
  * ```
  */
 class GherkinScenarioLine(
-    val Outline: Boolean,
+    val outline: Boolean,
     val other: GherkinOther
 )
 
