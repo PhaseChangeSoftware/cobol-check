@@ -81,28 +81,28 @@ public class ConfigIT {
     @Test
     public void it_returns_empty_string_when_application_source_filenames_have_no_suffix() {
         Config.load("testconfigNoCopybookSuffix.properties");
-        List<String> expected = new ArrayList();
+        List<String> expected = new ArrayList<>();
         assertEquals(expected, Config.getApplicationFilenameSuffixes());
     }
 
     @Test
     public void it_returns_list_of_specified_application_source_filename_suffixes() {
         Config.load("testconfig.properties");
-        List<String> expected = new ArrayList(Arrays.asList( ".CBL", ".cbl", ".COB", ".cob" ));
+        List<String> expected = new ArrayList<>(Arrays.asList( ".CBL", ".cbl", ".COB", ".cob" ));
         assertEquals(expected, Config.getApplicationFilenameSuffixes());
     }
 
     @Test
     public void it_returns_empty_string_when_application_copybook_filenames_have_no_suffix() {
         Config.load("testconfigNoCopybookSuffix.properties");
-        List<String> expected = new ArrayList();
+        List<String> expected = new ArrayList<>();
         assertEquals(expected, Config.getCopybookFilenameSuffixes());
     }
 
     @Test
     public void it_returns_list_of_specified_application_copybook_filename_suffixes() {
         Config.load("testconfig.properties");
-        List<String> expected = new ArrayList(Arrays.asList( ".CBL", ".cbl", ".COB", ".cob", ".CPY", ".cpy" ));
+        List<String> expected = new ArrayList<>(Arrays.asList( ".CBL", ".cbl", ".COB", ".cob", ".CPY", ".cpy" ));
         assertEquals(expected, Config.getCopybookFilenameSuffixes());
     }
 }

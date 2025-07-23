@@ -104,7 +104,10 @@ test {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << '-Xlint:deprecation'
+    options.compilerArgs += [
+            '-Xlint:deprecation',
+            '-Xlint:unchecked'
+    ]
     options.deprecation = true
 }
 
@@ -135,6 +138,12 @@ def unitTest = tasks.register('unitTest', Test) {
         includeTestsMatching 'ai.phasechange.gherkin.*Test'
     }
 }
+
+tasks.unitTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
+}
+
 def integrationTest = tasks.register('integrationTest', Test) {
     description = 'Run integration tests only'
     dependsOn unitTest
@@ -143,6 +152,12 @@ def integrationTest = tasks.register('integrationTest', Test) {
         includeTestsMatching 'org.openmainframeproject.cobolcheck.*IT'
     }
 }
+
+tasks.integrationTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
+}
+
 
 task clearLibJar(type: Delete) {
     delete fileTree(dir: 'build/libs', include: '**.jar')
@@ -239,6 +254,11 @@ def approvalTest = tasks.register('approvalTest', Test) {
     } else {
         println "${approvalExpectedOutput} matches ${approvalActualOutput} - PASS"
     }
+}
+
+tasks.approvalTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
 }
 
 task defaultProperties {
