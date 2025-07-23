@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Lexer
 
-class PhaseChangeGherkinParserImpl() {
+class PhaseChangeGherkinParserImpl {
     private val errorListener = AntlrParserAccumulatingErrorListener()
     private fun getLexer(fileText: String): Lexer {
         val stream = CharStreams.fromString(fileText)

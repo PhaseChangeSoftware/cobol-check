@@ -386,13 +386,13 @@ public class Config {
         }
         Locale locale;
         if (!settings.containsKey(LOCALE_COUNTRY_CONFIG_KEY)) {
-            locale = new Locale(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY));
+            locale = Locale.of(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY));
         } else if (!settings.containsKey(LOCALE_VARIANT_CONFIG_KEY)) {
-            locale = new Locale(
+            locale = Locale.of(
                     settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
                     settings.getProperty(LOCALE_COUNTRY_CONFIG_KEY));
         } else {
-            locale = new Locale(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
+            locale = Locale.of(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
                     settings.getProperty(LOCALE_COUNTRY_CONFIG_KEY),
                     settings.getProperty(LOCALE_VARIANT_CONFIG_KEY));
         }
