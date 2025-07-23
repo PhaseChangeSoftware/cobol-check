@@ -1,0 +1,7 @@
+export VERSION=$1
+./cobolcheckz -p NUMBERS > approval-test-actual.txt
+./cobolcheckz -p ALPHA >> approval-test-actual.txt
+./cobolcheckz -p GREETING >> approval-test-actual.txt
+./cobolcheckz -p FILECOPY >> approval-test-actual.txt
+./cobolcheckz -p MOCKTEST >> approval-test-actual.txt
+./cobolcheckz -p DPICNUMBERS >> approval-test-actual.txt

@@ -232,6 +232,7 @@ def approvalTest = tasks.register('approvalTest', Test) {
     dependsOn shadowJar
     def output = -1
 
+    println System.getProperty('os.name')
     if (System.getProperty('os.name') == 'linux') {
         println 'Linux detected'
         def proc = './approvaltest'.execute()
@@ -278,6 +279,10 @@ tasks.register('osInfo') {
         println "Version:      ${System.getProperty('os.version')}"
         println "Architecture: ${System.getProperty('os.arch')}"
     }
+}
+
+test {
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
 compileKotlin {
