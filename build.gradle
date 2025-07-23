@@ -6,6 +6,7 @@ plugins {
     id 'jacoco'
     id 'antlr'
     id 'org.jetbrains.kotlin.jvm'
+    id('com.github.johnrengelman.shadow') version '7.1.2'
 }
 
 kotlin {
@@ -159,11 +160,11 @@ tasks.integrationTest {
 }
 
 
-task clearLibJar(type: Delete) {
+tasks.register('clearLibJar', Delete) {
     delete fileTree(dir: 'build/libs', include: '**.jar')
 }
 
-task fatJar(type: Jar) {
+shadowJar {
     archiveFileName.set "${productName}-${productVersion}.jar"
     description = 'Create executable jar'
     dependsOn integrationTest, clearLibJar
@@ -172,32 +173,29 @@ task fatJar(type: Jar) {
                 'Implementation-Title': 'Gradle Quickstart',
                 'Implementation-Version': productVersion
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
 }
 
-task copyJarToBin(type: Copy) {
+tasks.register('copyJarToBin', Copy) {
     description = 'Copy executable jar to bin directory prior to distribution'
-    dependsOn fatJar
+    dependsOn shadowJar
     from('build/libs/')
     include '**/*.jar'
     into 'bin/'
 }
 
-task clearExtensionJar(type: Delete) {
+tasks.register('clearExtensionJar', Delete) {
     delete fileTree(dir: 'vs-code-extension/Cobol-check/bin', include: '**.jar')
 }
 
-task copyJarToExtension(type: Copy) {
+tasks.register('copyJarToExtension', Copy) {
     description = 'Copy executable jar to bin and VS Code extension bin directories prior to distribution'
-    dependsOn clearExtensionJar, fatJar
+    dependsOn clearExtensionJar, shadowJar
     from('build/libs/')
     include '**/*.jar'
     into 'vs-code-extension/Cobol-check/bin/'
 }
 
-
-task copyRunScripts(type: Copy) {
+tasks.register('copyRunScripts', Copy) {
     description = 'Makes copies of run scripts'
     from "${projectDir}/cobolcheck.cmd"
     into "${projectDir}/GradleTemp"
@@ -207,7 +205,7 @@ task copyRunScripts(type: Copy) {
     filter { line -> line.replaceAll('@VERSION@', productVersion) }
 }
 
-task prepareDistribution(type: Zip) {
+tasks.register('prepareDistribution', Zip) {
     archiveFileName.set "${productName}-${productVersion}.zip"
     description = 'Prepare distribution archive'
     dependsOn copyJarToBin, copyJarToExtension, copyRunScripts
@@ -231,7 +229,7 @@ task prepareDistribution(type: Zip) {
 
 def approvalTest = tasks.register('approvalTest', Test) {
     description = 'Run approval test only'
-    dependsOn fatJar
+    dependsOn shadowJar
     def output = -1
 
     if (System.getProperty('os.name') == 'linux') {
@@ -261,18 +259,19 @@ tasks.approvalTest {
     classpath = testing.suites.test.sources.runtimeClasspath
 }
 
-task defaultProperties {
+tasks.register('defaultProperties') {
     description = 'Show the default properties for this project'
     println "Project: $project"
     println "Name: $name"
     println "Path: $path"
     println "Project directory: $projectDir"
-    println "Build directory: $buildDir"
+    println "Build directory: ${layout.getBuildDirectory()}"
     println "Version: $version"
     println "Group: $project.group"
     println "Description: $project.description"
 }
-task osInfo {
+
+tasks.register('osInfo') {
     description = 'Show information about the operating system'
     doLast {
         println "Family:       ${System.getProperty('os.name')}"
@@ -297,7 +296,7 @@ class BuildHelper {
             reader1 = new BufferedReader(new FileReader(file1))
             reader2 = new BufferedReader(new FileReader(file2))
             int lineCount = 0
-            String line1 = ''
+            String line1
             String line2 = ''
             while ((line1 = reader1.readLine()) != null && (line2 = reader2.readLine()) != null) {
                 lineCount++
