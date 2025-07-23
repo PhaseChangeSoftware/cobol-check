@@ -1,4 +1,4 @@
-import static org.apache.tools.ant.taskdefs.condition.Os.*
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
@@ -6,27 +6,36 @@ plugins {
     id 'jacoco'
     id 'antlr'
     id 'org.jetbrains.kotlin.jvm'
+    id('com.github.johnrengelman.shadow') version '7.1.2'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_21
+    }
 }
 
 def productVersion = '0.2.19'
 def productName = 'cobol-check'
 group = 'org.openmainframeproject'
 description = 'Unit testing framework for Cobol'
-
-def approvalExpectedOutput = "approval-test-expected.txt"
-def approvalActualOutput = "output/testResults.txt"
+rootProject.tasks.named('processResources') {
+    duplicatesStrategy = 'include'
+}
+def approvalExpectedOutput = 'approval-test-expected.txt'
+def approvalActualOutput = 'output/testResults.txt'
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "neopragma_cobol-check"
-        property "sonar.organization", "neopragma-github"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.exclusions", "**/EIBResponseCodes.java,**/Keyword.java"
+        property 'sonar.projectKey', 'neopragma_cobol-check'
+        property 'sonar.organization', 'neopragma-github'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.exclusions', '**/EIBResponseCodes.java,**/Keyword.java'
     }
 }
 
 jacoco {
-    toolVersion = "0.8.6"
+    toolVersion = '0.8.13'
 }
 
 jacocoTestCoverageVerification {
@@ -66,8 +75,8 @@ ext {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -77,22 +86,29 @@ repositories {
 sourceSets {
     main {
         resources {
-            srcDirs "src/main/resources", "src/test/resources"
+            srcDirs 'src/main/resources', 'src/test/resources'
         }
     }
 }
 
+generateGrammarSource {
+    arguments += ['-visitor']
+}
+
 test {
-    description 'Runs all tests'
+    description = 'Runs all tests'
     testLogging {
         showStandardStreams = true
-        events "passed", "skipped", "failed"
+        events 'passed', 'skipped', 'failed'
     }
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:deprecation'
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+            '-Xlint:deprecation',
+            '-Xlint:unchecked'
+    ]
     options.deprecation = true
 }
 
@@ -104,73 +120,83 @@ dependencies {
     implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
     implementation 'org.antlr:antlr4-runtime:4.13.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    testImplementation('org.junit.jupiter:junit-jupiter:5.6.1')
-    testImplementation('org.junit.jupiter:junit-jupiter-params:5.7.0')
-    testImplementation 'org.mockito:mockito-inline:3.6.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    testImplementation('org.junit.jupiter:junit-jupiter:5.13.0')
+    testImplementation('org.junit.jupiter:junit-jupiter-params:5.13.0')
+    testImplementation('org.junit.platform:junit-platform-engine:1.13.0')
+    testImplementation('org.junit.platform:junit-platform-launcher:1.13.0')
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.13.0'
     testImplementation 'org.slf4j:slf4j-api:1.7.36'
-    testImplementation 'ch.qos.logback:logback-classic:0.9.26'
+    testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.1'
 }
 
-def unitTest = tasks.register("unitTest", Test) {
-    description 'Run unit tests only'
+def unitTest = tasks.register('unitTest', Test) {
+    description = 'Run unit tests only'
     useJUnitPlatform()
     filter {
-        includeTestsMatching "org.openmainframeproject.cobolcheck.*Test"
-        includeTestsMatching "ai.phasechange.gherkin.*Test"
+        includeTestsMatching 'org.openmainframeproject.cobolcheck.*Test'
+        includeTestsMatching 'ai.phasechange.gherkin.*Test'
     }
 }
-def integrationTest = tasks.register("integrationTest", Test) {
-    description 'Run integration tests only'
+
+tasks.unitTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
+}
+
+def integrationTest = tasks.register('integrationTest', Test) {
+    description = 'Run integration tests only'
     dependsOn unitTest
     useJUnitPlatform()
     filter {
-        includeTestsMatching "org.openmainframeproject.cobolcheck.*IT"
+        includeTestsMatching 'org.openmainframeproject.cobolcheck.*IT'
     }
 }
 
-task clearLibJar(type: Delete) {
-    delete fileTree(dir:'build/libs', include: '**.jar')
+tasks.integrationTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
 }
 
-task fatJar(type: Jar) {
-//    archiveFileName "${productName}-${productVersion}.jar"
-    archiveName "${productName}-${productVersion}.jar"
-    description 'Create executable jar'
+
+tasks.register('clearLibJar', Delete) {
+    delete fileTree(dir: 'build/libs', include: '**.jar')
+}
+
+shadowJar {
+    archiveFileName.set "${productName}-${productVersion}.jar"
+    description = 'Create executable jar'
     dependsOn integrationTest, clearLibJar
     manifest {
         attributes 'Main-Class': "${mainClassName}",
-                   'Implementation-Title': 'Gradle Quickstart',
-                   'Implementation-Version': productVersion
+                'Implementation-Title': 'Gradle Quickstart',
+                'Implementation-Version': productVersion
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
 }
 
-task copyJarToBin(type: Copy) {
-    description 'Copy executable jar to bin directory prior to distribution'
-    dependsOn fatJar
+tasks.register('copyJarToBin', Copy) {
+    description = 'Copy executable jar to bin directory prior to distribution'
+    dependsOn shadowJar
     from('build/libs/')
     include '**/*.jar'
     into 'bin/'
 }
 
-task clearExtensionJar(type: Delete) {
-    delete fileTree(dir:'vs-code-extension/Cobol-check/bin', include: '**.jar')
+tasks.register('clearExtensionJar', Delete) {
+    delete fileTree(dir: 'vs-code-extension/Cobol-check/bin', include: '**.jar')
 }
 
-task copyJarToExtension(type: Copy) {
-    description 'Copy executable jar to bin and VS Code extension bin directories prior to distribution'
-    dependsOn clearExtensionJar, fatJar
+tasks.register('copyJarToExtension', Copy) {
+    description = 'Copy executable jar to bin and VS Code extension bin directories prior to distribution'
+    dependsOn clearExtensionJar, shadowJar
     from('build/libs/')
     include '**/*.jar'
     into 'vs-code-extension/Cobol-check/bin/'
 }
 
-
-task copyRunScripts(type: Copy) {
-    description 'Makes copies of run scripts'
+tasks.register('copyRunScripts', Copy) {
+    description = 'Makes copies of run scripts'
     from "${projectDir}/cobolcheck.cmd"
     into "${projectDir}/GradleTemp"
     filter { line -> line.replaceAll('@VERSION@', productVersion) }
@@ -179,41 +205,42 @@ task copyRunScripts(type: Copy) {
     filter { line -> line.replaceAll('@VERSION@', productVersion) }
 }
 
-task prepareDistribution(type: Zip) {
-    archiveName "${productName}-${productVersion}.zip"
-    description 'Prepare distribution archive'
+tasks.register('prepareDistribution', Zip) {
+    archiveFileName.set "${productName}-${productVersion}.zip"
+    description = 'Prepare distribution archive'
     dependsOn copyJarToBin, copyJarToExtension, copyRunScripts
-    from ("${projectDir}"){
-        include([ "config.properties",
-                  "scripts/*",
-                  "bin/${productName}-${productVersion}.jar",
-                  "src/main/cobol/ALPHA.CBL",
-                  "src/main/cobol/NUMBERS.CBL",
-                  "src/test/cobol/ALPHA/*",
-                  "src/test/cobol/NUMBERS/*" ])
-        rename("build/libs/(.*)", "\$1")
+    from("${projectDir}") {
+        include(['config.properties',
+                 'scripts/*',
+                 "bin/${productName}-${productVersion}.jar",
+                 'src/main/cobol/ALPHA.CBL',
+                 'src/main/cobol/NUMBERS.CBL',
+                 'src/test/cobol/ALPHA/*',
+                 'src/test/cobol/NUMBERS/*'])
+        rename('build/libs/(.*)', '$1')
     }
 
-    from ("${projectDir}/GradleTemp")
+    from("${projectDir}/GradleTemp")
 
     doLast {
-        delete "GradleTemp"
+        delete 'GradleTemp'
     }
 }
 
-def approvalTest = tasks.register("approvalTest", Test) {
-    description 'Run approval test only'
-    dependsOn fatJar
+def approvalTest = tasks.register('approvalTest', Test) {
+    description = 'Run approval test only'
+    dependsOn shadowJar
     def output = -1
 
-    if ("${OS_NAME}" == "linux") {
-        println "Linux detected"
-        def proc = "./approvaltest".execute()
+    println System.getProperty('os.name')
+    if (System.getProperty('os.name') == 'linux') {
+        println 'Linux detected'
+        def proc = './approvaltest'.execute()
         proc.waitForProcessOutput(System.out, System.err)
     }
-    if ("${OS_NAME}".toLowerCase().contains("windows")) {
-        println "Windows detected"
-        def proc = "./approvaltestWin.cmd".execute()
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        println 'Windows detected'
+        def proc = './approvaltestWin.cmd'.execute()
         proc.waitForProcessOutput(System.out, System.err)
     }
 
@@ -221,52 +248,68 @@ def approvalTest = tasks.register("approvalTest", Test) {
     println "exit from compare: ${output}"
 
     if (output != 0) {
-        println "*** FAIL ***"
+        println '*** FAIL ***'
         throw new StopExecutionException("${approvalExpectedOutput} and ${approvalActualOutput} are different")
     } else {
         println "${approvalExpectedOutput} matches ${approvalActualOutput} - PASS"
     }
 }
 
-task defaultProperties {
-    description 'Show the default properties for this project'
+tasks.approvalTest {
+    testClassesDirs = testing.suites.test.sources.output.classesDirs
+    classpath = testing.suites.test.sources.runtimeClasspath
+}
+
+tasks.register('defaultProperties') {
+    description = 'Show the default properties for this project'
     println "Project: $project"
     println "Name: $name"
     println "Path: $path"
     println "Project directory: $projectDir"
-    println "Build directory: $buildDir"
+    println "Build directory: ${layout.getBuildDirectory()}"
     println "Version: $version"
     println "Group: $project.group"
     println "Description: $project.description"
 }
-task osInfo {
-    description 'Show information about the operating system'
+
+tasks.register('osInfo') {
+    description = 'Show information about the operating system'
     doLast {
-        println "Family:       ${OS_NAME}"
-        println "Version:      ${OS_VERSION}"
-        println "Architecture: ${OS_ARCH}"
+        println "Family:       ${System.getProperty('os.name')}"
+        println "Version:      ${System.getProperty('os.version')}"
+        println "Architecture: ${System.getProperty('os.arch')}"
     }
 }
-compileKotlin {
+
+test {
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
-class BuildHelper{
-    int compareFiles(String file1, String file2, boolean trimLines){
+compileKotlin {
+    dependsOn generateGrammarSource
+}
+
+compileTestKotlin {
+    dependsOn generateTestGrammarSource
+}
+
+class BuildHelper {
+    static int compareFiles(String file1, String file2, boolean trimLines) {
         BufferedReader reader1
         BufferedReader reader2
-        try{
+        try {
             reader1 = new BufferedReader(new FileReader(file1))
             reader2 = new BufferedReader(new FileReader(file2))
             int lineCount = 0
-            String line1 = ""
-            String line2 = ""
-            while ((line1 = reader1.readLine()) != null && (line2 = reader2.readLine()) != null){
+            String line1
+            String line2 = ''
+            while ((line1 = reader1.readLine()) != null && (line2 = reader2.readLine()) != null) {
                 lineCount++
-                if (trimLines){
+                if (trimLines) {
                     line1 = line1.trim()
                     line2 = line2.trim()
                 }
-                if (!line1.equals(line2)){
+                if (line1 != line2) {
                     println("Difference on line ${lineCount}:")
                     println("   ${file1}: ${line1}")
                     println("   ${file2}: ${line2}")
@@ -274,10 +317,10 @@ class BuildHelper{
                 }
             }
             return 0
-        } catch( Exception e){
+        } catch (Exception e) {
             println("Error while comparing: ${e.message}")
             return -1
-        } finally{
+        } finally {
             if (reader1 != null) reader1.close()
             if (reader2 != null) reader2.close()
         }

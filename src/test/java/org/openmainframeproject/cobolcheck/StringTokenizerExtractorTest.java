@@ -21,7 +21,7 @@ public class StringTokenizerExtractorTest {
 
     @BeforeEach
     public void commonSetup() {
-        Locale.setDefault(new Locale("en", "US"));
+        Locale.setDefault(Locale.of("en", "US"));
         extractor = new StringTokenizerExtractor();
     }
 

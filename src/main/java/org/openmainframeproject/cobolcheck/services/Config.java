@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import java.util.stream.Collectors;
 import org.openmainframeproject.cobolcheck.exceptions.IOExceptionProcessingConfigFile;
 import org.openmainframeproject.cobolcheck.exceptions.PossibleInternalLogicErrorException;
 import org.openmainframeproject.cobolcheck.features.launcher.Formatter.DataTransferObjects.DataTransferObjectStyle;
@@ -319,6 +320,7 @@ public class Config {
         return StringHelper.adjustPathString(pathString);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getApplicationFilenameSuffixes() {
         return (List<String>) settings.get(RESOLVED_APPLICATION_SOURCE_FILENAME_SUFFIX);
     }
@@ -327,6 +329,7 @@ public class Config {
         resolveFilenameSuffixes(APPLICATION_SOURCE_FILENAME_SUFFIX, RESOLVED_APPLICATION_SOURCE_FILENAME_SUFFIX);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getCopybookFilenameSuffixes() {
         return (List<String>) settings.get(RESOLVED_APPLICATION_COPYBOOK_FILENAME_SUFFIX);
     }
@@ -336,6 +339,7 @@ public class Config {
                 DEFAULT_COBOLCHECK_SCRIPT_DIRECTORY));
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getGnuCOBOLCompileOptions() {
         setGnuCOBOLCompileOptions();
         return (List<String>)settings.get(RESOLVED_GNUCOBOL_COMPILE_OPTIONS);
@@ -356,7 +360,7 @@ public class Config {
 
     private static void resolveFilenameSuffixes(String configKey, String resolvedConfigKey) {
         String suffixSpecification = getString(configKey, NONE);
-        List<String> suffixes = new ArrayList();
+        List<String> suffixes = new ArrayList<>();
         String[] suffixValues = null;
         if (!suffixSpecification.equalsIgnoreCase(NONE)) {
             suffixValues = suffixSpecification.split(Constants.COMMA);
@@ -369,7 +373,7 @@ public class Config {
 
     private static void resolveConfigList(String configKey, String resolvedConfigKey) {
         String configCommaSeperatedList = getString(configKey, "NULL");
-        List<String> items = new ArrayList();
+        List<String> items = new ArrayList<>();
         String[] configListValues = null;
         if (!configCommaSeperatedList.trim().equalsIgnoreCase("NULL")) {
             configListValues = configCommaSeperatedList.split(Constants.COMMA);
@@ -386,13 +390,13 @@ public class Config {
         }
         Locale locale;
         if (!settings.containsKey(LOCALE_COUNTRY_CONFIG_KEY)) {
-            locale = new Locale(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY));
+            locale = Locale.of(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY));
         } else if (!settings.containsKey(LOCALE_VARIANT_CONFIG_KEY)) {
-            locale = new Locale(
+            locale = Locale.of(
                     settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
                     settings.getProperty(LOCALE_COUNTRY_CONFIG_KEY));
         } else {
-            locale = new Locale(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
+            locale = Locale.of(settings.getProperty(LOCALE_LANGUAGE_CONFIG_KEY),
                     settings.getProperty(LOCALE_COUNTRY_CONFIG_KEY),
                     settings.getProperty(LOCALE_VARIANT_CONFIG_KEY));
         }

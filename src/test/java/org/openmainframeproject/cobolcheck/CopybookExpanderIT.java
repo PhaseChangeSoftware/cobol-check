@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class CopybookExpanderIT {
-    private static final String applicationSourceFilenameSuffix = ".CBL";
+    public static final String applicationSourceFilenameSuffix = ".CBL";
     private CopybookExpander copybookExpander;
     private List<String> expectedResult;
     private String testCopybookFilename;

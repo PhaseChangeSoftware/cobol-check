@@ -1,6 +1,6 @@
 package org.openmainframeproject.cobolcheck.services;
 
-public class StringTuple implements Tuple {
+public class StringTuple implements Tuple<String, String> {
     private final String first;
     public final String second;
     public StringTuple(String first, String second) {
