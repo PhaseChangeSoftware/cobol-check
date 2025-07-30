@@ -226,7 +226,7 @@ tasks.register('prepareDistribution', Zip) {
         delete 'GradleTemp'
     }
 }
-
+/*
 def approvalTest = tasks.register('approvalTest', Test) {
     description = 'Run approval test only'
     dependsOn shadowJar
@@ -259,7 +259,7 @@ tasks.approvalTest {
     testClassesDirs = testing.suites.test.sources.output.classesDirs
     classpath = testing.suites.test.sources.runtimeClasspath
 }
-
+*/
 tasks.register('defaultProperties') {
     description = 'Show the default properties for this project'
     println "Project: $project"

@@ -131,7 +131,10 @@ class GherkinDataTable(
  * docString : DOCSTRING1 | DOCSTRING2 | DOCSTRING3 ;
  * ```
  */
-class GherkinDocString(val docString: String) : AbstractGherkin()
+class GherkinDocString(
+    override val name: String,
+    override val variables: List<String>?
+) : AbstractGherkin(), GherkinVariableString
 
 /**
  * ```
@@ -272,9 +275,9 @@ class GherkinKeyword(
  * ```
  */
 class GherkinOther(
-    val name: String,
-    val variables: List<String>?
-) : AbstractGherkin()
+    override val name: String,
+    override val variables: List<String>?
+) : AbstractGherkin(), GherkinVariableString
 
 /**
  * ```

@@ -138,7 +138,8 @@ class GherkinVisitor : GherkinParserBaseVisitor<AbstractGherkin>() {
 
     override fun visitDocString(ctx: GherkinParser.DocStringContext): GherkinDocString {
         return GherkinDocString(
-            ctx.start.inputStream.getText(Interval(ctx.start.startIndex, ctx.stop.stopIndex))
+            ctx.start.inputStream.getText(Interval(ctx.start.startIndex, ctx.stop.stopIndex)),
+            null
         )
     }
 
@@ -151,7 +152,7 @@ class GherkinVisitor : GherkinParserBaseVisitor<AbstractGherkin>() {
             },
             ctx.examplesDefinition()?.map {
                 visitExamplesDefinition(it)
-            }
+            }?.ifEmpty { null }
         )
     }
 
