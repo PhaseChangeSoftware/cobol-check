@@ -118,12 +118,21 @@ class GherkinStepArg(
 ) : AbstractGherkin()
 
 /**
+ * ...
+ * TABLEROW : ('|'((~[|\r\n])|('\\\\|'))*)+(~[\\]'|')(~[\r\n])*;
+ */
+class GherkinTABLEROW(
+    override val name: String,
+    override val variables: List<String>?
+) : AbstractGherkin(), GherkinVariableString
+
+/**
  * ```
  * dataTable : noline* TABLEROW (noline+ TABLEROW)* ;
  * ```
  */
 class GherkinDataTable(
-    val tableRows: List<String>
+    val tableRows: List<GherkinTABLEROW>
 ) : AbstractGherkin()
 
 /**
