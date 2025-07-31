@@ -47,7 +47,7 @@ scenarioDefinition : noline* tags? scenario ;
 scenario : scenarioLine  descriptionHelper (step (EMPTY step)*)* examplesDefinition*;
 examplesDefinition : noline* tags? examplesLine descriptionHelper dataTable? ;
 
-step : noline* stepLine (EMPTY stepArg)? ;
+step : noline* tags? stepLine (EMPTY stepArg)? ;
 stepArg : (dataTable | docString) ;
 
 dataTable : noline* TABLEROW (noline+ TABLEROW)* ;

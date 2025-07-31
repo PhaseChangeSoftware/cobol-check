@@ -97,6 +97,7 @@ class GherkinVisitor : GherkinParserBaseVisitor<AbstractGherkin>() {
 
     override fun visitStep(ctx: GherkinParser.StepContext): GherkinStep {
         return GherkinStep(
+            ctx.tags()?.let{visitTags(it)},
             visitStepLine(ctx.stepLine()),
             ctx.stepArg()?.let { visitStepArg(it) }
         )

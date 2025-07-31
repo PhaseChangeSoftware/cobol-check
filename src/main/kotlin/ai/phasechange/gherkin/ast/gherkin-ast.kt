@@ -103,6 +103,7 @@ class GherkinExamplesDefinition(
  * ```
  */
 class GherkinStep(
+    val tags: GherkinTags?,
     val stepLine: GherkinStepLine,
     val stepArg: GherkinStepArg?
 ) : AbstractGherkin()

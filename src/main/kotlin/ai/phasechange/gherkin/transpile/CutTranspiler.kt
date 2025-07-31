@@ -123,6 +123,10 @@ class CutTranspiler : AbstractAstVisitor() {
     }
 
     private fun visit(step: GherkinStep, variableStore: VariableStore, idx: Int) {
+        step.tags?.also {arg ->
+            // parsing of tag specification goes here
+            builder.append("      *${step.tags.taglines.forEach { tagline -> tagline.tagline.forEach { it.tag } }} ")
+        }
         step.stepLine.other?.also { other ->
             builder.append("      *${step.stepLine.type.name} ")
             builder.append(subVariables(other, variableStore, idx))
@@ -159,7 +163,15 @@ class CutTranspiler : AbstractAstVisitor() {
             if (it.length > separatorIndex) it.substring(separatorIndex) else it
         }
     }
-
+    override fun visit (step: GherkinStep) {
+        step.tags?.also {
+            visit(it)
+            val outstring =  step.tags.taglines.flatMap { tagline -> tagline.tagline.map { t -> t.tag } }
+            builder.append("      *${outstring.joinToString ( " " )} \n")
+        }
+        visit(step.stepLine)
+        step.stepArg?.also { visit(it) }
+    }
     override fun visit(stepLine: GherkinStepLine) {
         builder.append("      *")
         builder.append(stepLine.type.name)
