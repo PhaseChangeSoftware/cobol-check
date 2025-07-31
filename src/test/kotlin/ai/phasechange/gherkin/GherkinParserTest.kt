@@ -1,6 +1,7 @@
 package ai.phasechange.gherkin
 
 import ai.phasechange.gherkin.ast.GherkinVisitor
+import ai.phasechange.gherkin.transpile.CutTranspiler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,6 +34,12 @@ class GherkinParserTest {
             file.nameWithoutExtension != "empty"
         ) {
             assertNotNull(document) { "Document is null for $file" }
+            println("=================================================")
+            document?.also {
+                val transpiler = CutTranspiler()
+                transpiler.visit(it)
+                println(transpiler.output())
+            }
         }
         //assertEquals(expected, output);
     }

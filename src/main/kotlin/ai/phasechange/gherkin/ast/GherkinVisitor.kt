@@ -128,17 +128,25 @@ class GherkinVisitor : GherkinParserBaseVisitor<AbstractGherkin>() {
         )
     }
 
+    private fun findVariables(inString: String): List<String>? {
+        val regex = Regex("<([^<>]+)>")
+        return regex.findAll(inString)
+            .map { it.groupValues[1] }
+            .toList().ifEmpty { null }
+    }
+
     override fun visitDataTable(ctx: GherkinParser.DataTableContext): GherkinDataTable {
         return GherkinDataTable(
             ctx.TABLEROW().map {
-                it.text
+                GherkinTABLEROW(it.text, findVariables(it.text))
             }
         )
     }
 
     override fun visitDocString(ctx: GherkinParser.DocStringContext): GherkinDocString {
         return GherkinDocString(
-            ctx.start.inputStream.getText(Interval(ctx.start.startIndex, ctx.stop.stopIndex))
+            ctx.start.inputStream.getText(Interval(ctx.start.startIndex, ctx.stop.stopIndex)),
+            findVariables(ctx.text)
         )
     }
 
@@ -151,7 +159,7 @@ class GherkinVisitor : GherkinParserBaseVisitor<AbstractGherkin>() {
             },
             ctx.examplesDefinition()?.map {
                 visitExamplesDefinition(it)
-            }
+            }?.ifEmpty { null }
         )
     }
 
