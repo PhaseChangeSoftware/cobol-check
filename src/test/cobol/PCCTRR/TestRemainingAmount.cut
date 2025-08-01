@@ -1,0 +1,38 @@
+       TESTSUITE 'Calculate REFTRAN-REMAINING-AMT for rejected transactions'
+
+       TESTCASE 'Calculate remaining amount when transaction has no errors and no refunds'
+      *GIVEN a rejected transaction record with transaction ID RTRAN-TRANS-ID of 12345678901234567890
+      MOCK READ REJECT-IN-FILE INTO REJECTED-TRANSACTION-RECORD
+                           AT END MOVE 'COMPLETE' TO WS-FILE-IND
+                                  CLOSE REJECT-IN-FILE
+                                  CLOSE REFUND-OUT-FILE
+                                  GO TO 2200-EXIT.
+           MOVE 12345678901234567890 TO RTRAN-TRANS-ID.
+      END-MOCK
+
+      *AND the charges master file contains a record with:
+      *" CHG-KEY             ", " CHG-ERR-IND ", " CHG-COUNT ", " CHG-AMT ", " CHG-STATE ",
+      *" 12345678901234567890", " " "         ", " 0         ", " 10000   ", " FL        ",
+      MOCK READ CHARGES-V-MASTER.
+          MOVE 0 TO WS-CHG-STATUS
+          MOVE 12345678901234567890 TO CHG-KEY
+          MOVE " " TO CHG-ERR-IND
+          MOVE 0 TO CHG-COUNT
+          MOVE 10000 TO CHG-AMT
+          MOVE "FL" TO CHG-STATE
+      END-MOCK.
+      *AND no surcharge paid record exists for transaction ID 12345678901234567890
+      MOCK READ SURCHARGE-PAIDS.
+          MOVE 23 TO WS-SURCH-STATUS.
+      END-MOCK.
+      *AND no retailer refund records exist for transaction ID 12345678901234567890
+      MOCK READ RETAILER-REFS.
+          MOVE 23 TO WS-RETREF-STATUS.
+      END-MOCK.
+      *AND no latest refund record exists for transaction ID 12345678901234567890
+      MOCK READ LATEST-REFS.
+          MOVE 23 TO WS-LATEST-STATUS.
+      *WHEN 200-READ-INPUT is performed
+      PERFORM 200-READ-INPUT.
+      *THEN the remaining amount REFTRAN-REMAINING-AMT should be 10000
+      EXPECT REFTRAN-REMAINING-AMT IS 10000
