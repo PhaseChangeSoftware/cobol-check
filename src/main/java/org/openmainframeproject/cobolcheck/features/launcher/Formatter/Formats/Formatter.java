@@ -5,10 +5,10 @@ import org.openmainframeproject.cobolcheck.features.launcher.Formatter.DataTrans
 import org.openmainframeproject.cobolcheck.features.interpreter.StringTokenizerExtractor;
 import org.openmainframeproject.cobolcheck.services.Constants;
 import org.openmainframeproject.cobolcheck.services.StringHelper;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.TokenExtractor;
 import org.openmainframeproject.cobolcheck.services.log.Log;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -152,11 +152,11 @@ public abstract class Formatter {
     }
 
     private String getFailureType(String line){
-        List<String> tokens = tokenExtractor.extractTokensFrom(line);
+        List<Token> tokens = tokenExtractor.extractTokensFrom(line);
         if (!tokens.isEmpty()) {
-            if (tokens.get(0).equalsIgnoreCase(expectedKeyword)){
-                for (String token : tokens){
-                    if (verifyCompareKeywords.contains(token.toUpperCase(Locale.ROOT))){
+            if (tokens.get(0).token.equalsIgnoreCase(expectedKeyword)){
+                for (Token token : tokens){
+                    if (verifyCompareKeywords.contains(token.token.toUpperCase(Locale.ROOT))){
                         return verifyKeyword;
                     }
                 }

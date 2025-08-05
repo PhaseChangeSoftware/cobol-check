@@ -59,7 +59,7 @@ public class StringTokenizerExtractorTest {
         expected.add("'hello there'");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"This is some kind of long string\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\" This is some kind of long string \"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -92,7 +92,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"STRING' STRING\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"STRING ' STRING\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"STRING 'STRING\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"THIS WON'T AND CAN'T END THE STRING\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class StringTokenizerExtractorTest {
         expected.add("\"HI THERE\"");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class StringTokenizerExtractorTest {
         expected.add("' HI'");
         expected.add("TO");
         expected.add("VALUE-1");
-        assertEquals(expected, extractor.extractTokensFrom(line));
+        assertEquals(expected, extractor.extractTokensFrom(line).stream().map(k -> k.token).toList());
     }
 
     @Test
@@ -175,7 +175,7 @@ public class StringTokenizerExtractorTest {
     })
     public void it_treats_division_headers_as_single_tokens(String inputValue, String expectedValue) {
         assertEquals(expectedValue,
-                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0));
+                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0).token);
     }
 
     @ParameterizedTest
@@ -189,7 +189,7 @@ public class StringTokenizerExtractorTest {
     })
     public void it_treats_section_headers_as_single_tokens(String inputValue, String expectedValue) {
         assertEquals(expectedValue,
-                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0));
+                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0).token);
     }
 
     @ParameterizedTest
@@ -204,7 +204,7 @@ public class StringTokenizerExtractorTest {
     public void it_distinguishes_FILE_CONTROL_and_FILE_STATUS_and_FILE_SECTION(
             String inputValue, String expectedValue) {
         assertEquals(expectedValue,
-                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0));
+                extractor.extractTokensFrom(makeCobolSourceLineContaining(inputValue)).get(0).token);
     }
 
     private String makeCobolSourceLineContaining(String text) {

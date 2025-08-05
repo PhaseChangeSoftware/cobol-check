@@ -136,7 +136,7 @@ public class LineRepository {
     List<String> addExpandedCopyDB2Statements(CobolLine line) throws IOException {
         List<String> copyLines = new ArrayList<>();
         CopybookExpander copybookExpander = new CopybookExpander();
-        String copybookName = line.getToken(2);
+        String copybookName = line.getToken(2).token;
         StringTuple replacingValues = new StringTuple(null, null);
 
         try {

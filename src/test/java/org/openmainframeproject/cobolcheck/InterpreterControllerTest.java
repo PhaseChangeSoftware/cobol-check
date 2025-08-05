@@ -764,7 +764,7 @@ public class InterpreterControllerTest {
         String str5 = "               CREATE TABLE 'Hi'";
         String str6 = "               EXIT SECTION";
         String str7 = "";
-        String str8 = "      *Basically anything can be inside EXEC body, Cobol Check does not care";
+        String str8 = "      *Basically anything can be inside EXEC body, Cobol Check does not ";
         String str9 = "           END-EXEC";
         String str10 = "           .";
 
@@ -777,7 +777,7 @@ public class InterpreterControllerTest {
             currentLine = interpreterController.interpretNextLine();
             if (currentLine != null && currentLine.contains("END-EXEC")){
                 assertTrue(interpreterController.shouldCurrentStatementBeStubbed());
-                assertEquals(interpreterController.getCurrentStatement(), expectedStubbedStatement);
+                assertEquals(expectedStubbedStatement, interpreterController.getCurrentStatement());
                 testsRan = true;
             }
         }

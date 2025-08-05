@@ -1,8 +1,11 @@
 package org.openmainframeproject.cobolcheck.features.interpreter;
 
+import java.util.stream.Collectors;
 import org.openmainframeproject.cobolcheck.exceptions.PossibleInternalLogicErrorException;
 import org.openmainframeproject.cobolcheck.services.Constants;
 import org.openmainframeproject.cobolcheck.services.Messages;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.NewStringTokenizer;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.TokenExtractor;
 
 import java.util.*;
@@ -54,7 +57,7 @@ public class StringTokenizerExtractor implements TokenExtractor {
      * @return list of tokens (List&lt;String&gt;)
      */
     @Override
-    public List<String> extractTokensFrom(String sourceLine) {
+    public List<Token> extractTokensFrom(String sourceLine) {
         if (sourceLine == null) {
             throw new PossibleInternalLogicErrorException(
                  Messages.get("ERR001",
@@ -62,12 +65,12 @@ public class StringTokenizerExtractor implements TokenExtractor {
                          "StringTokenizerExtractor.extractTokensFrom(sourceLine)")
             );
         }
-        List<String> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>();
         List<String> expectedNext = new ArrayList<>();
         String saved = Constants.EMPTY_STRING;
         Map<String, String> stringTokensToString = new HashMap<>();
         sourceLine = swapStringsOutWithMappedTokens(sourceLine, stringTokensToString);
-        StringTokenizer tokenizer = new StringTokenizer(sourceLine, delimiters);
+        NewStringTokenizer tokenizer = new NewStringTokenizer(sourceLine, delimiters);
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken().toUpperCase(Locale.ROOT);
             if (token.startsWith(Constants.COMMENT_INDICATOR)) {
@@ -86,7 +89,7 @@ public class StringTokenizerExtractor implements TokenExtractor {
                 expectedNext = expectedTokens.get(token);
                 saved = token;
             } else {
-                tokens.add(token);
+                tokens.add(new Token(token, tokenizer.getCurrentPosition()));
             }
         }
         swapMappedTokensOutWithSavedStrings(tokens, stringTokensToString);
@@ -158,10 +161,10 @@ public class StringTokenizerExtractor implements TokenExtractor {
         return newString;
     }
 
-    private void swapMappedTokensOutWithSavedStrings(List<String> tokens, Map<String, String> stringTokensToString){
+    private void swapMappedTokensOutWithSavedStrings(List<Token> tokens, Map<String, String> stringTokensToString){
         for(int i = 0; i < tokens.size(); i++){
-            if (stringTokensToString.containsKey(tokens.get(i))){
-                tokens.set(i, stringTokensToString.get(tokens.get(i)));
+            if (stringTokensToString.containsKey(tokens.get(i).token)){
+                tokens.set(i, new Token(stringTokensToString.get(tokens.get(i).token), tokens.get(i).offset));
             }
         }
     }

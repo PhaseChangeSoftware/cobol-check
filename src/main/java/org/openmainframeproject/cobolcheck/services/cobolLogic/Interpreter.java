@@ -22,6 +22,10 @@ public class Interpreter {
         "OPEN", "CLOSE", "READ", "WRITE", "REWRITE", "DELETE", "START"
     );
 
+    private static final List<String> pageVerbs = Arrays.asList(
+        "EJECT"
+    );
+
     // Used for handling source lines from copybooks that may not have the standard 80-byte length
     private static final int minimumMeaningfulSourceLineLength = 7;
     private static final int commentIndicatorOffset = 6;
@@ -173,13 +177,13 @@ public class Interpreter {
             return false;
         }
         if (currentLine.containsToken(Constants.CALL_TOKEN)) {
-            List<String> currentTokens = currentLine.getTokens();
+            List<Token> currentTokens = currentLine.getTokens();
             int callTokenCount = 0, endCallTokenCount = 0;
-            for (String token : currentTokens) {
-                if (token.equals(Constants.CALL_TOKEN)) {
+            for (Token token : currentTokens) {
+                if (token.token.equals(Constants.CALL_TOKEN)) {
                     callTokenCount++;
                 }
-                if (token.equals(Constants.END_CALL_TOKEN)) {
+                if (token.token.equals(Constants.END_CALL_TOKEN)) {
                     endCallTokenCount++;
                 }
             }
@@ -193,7 +197,7 @@ public class Interpreter {
                 return false;
             }
         }
-        if (CobolVerbs.isStartOrEndCobolVerb(nextMeaningfulLine.getTokens().get(0))) {
+        if (CobolVerbs.isStartOrEndCobolVerb(nextMeaningfulLine.getTokens().get(0).token)) {
             if(wholeWordSearch(currentLine.getTrimmedString(), "JOIN") && nextMeaningfulLine.getTrimmedString().startsWith("ON")){
                 return false;
             }
@@ -238,7 +242,7 @@ public class Interpreter {
     }
 
     public static boolean isMeaningful(CobolLine line) {
-        return line != null && !isEmpty(line) && !isComment(line) && !isTooShortToBeMeaningful(line);
+        return line != null && !isEmpty(line) && !isComment(line) && !isTooShortToBeMeaningful(line) && !checkForPrintStatement(line);
     }
 
     /**
@@ -281,8 +285,10 @@ public class Interpreter {
      */
     public static boolean shouldLineBeStubbed(CobolLine line, State state) {
         if (state.isFlagSetFor(Constants.PROCEDURE_DIVISION)) {
-            if (checkForBatchFileIOStatement(line) || line.containsToken(Constants.CALL_TOKEN) ||
-                    line.containsToken(Constants.EXEC_SQL_TOKEN) || line.containsToken(Constants.EXEC_CICS_TOKEN) || line.containsToken(Constants.END_EXEC_TOKEN)) {
+            if (checkForBatchFileIOStatement(line) ||
+                line.containsToken(Constants.CALL_TOKEN) ||
+                    line.containsToken(Constants.EXEC_SQL_TOKEN) || line.containsToken(Constants.EXEC_CICS_TOKEN) ||
+                line.containsToken(Constants.END_EXEC_TOKEN)) {
                 return true;
             }
         }
@@ -357,20 +363,33 @@ public class Interpreter {
      */
     public static boolean checkForBatchFileIOStatement(CobolLine line) {
         for (String ioVerb : batchFileIOVerbs) {
-            if (isBatchFileIOStatement(line.getTokens(), ioVerb)) {
+            if (isVerbStatement(line.getTokens(), ioVerb)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean isBatchFileIOStatement(List<String> tokens, String ioVerb) {
-        return tokens.contains(ioVerb);
+    private static boolean isVerbStatement(List<Token> tokens, String ioVerb) {
+        return tokens.stream().anyMatch(k -> k.token.equals(ioVerb));
+    }
+
+    /**
+     * @param line
+     * @return true if the source line contains a batch file IO verb
+     */
+    public static boolean checkForPrintStatement(CobolLine line) {
+        for (String ioVerb : pageVerbs) {
+            if (isVerbStatement(line.getTokens(), ioVerb)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String getSectionOrParagraphName(CobolLine line) {
         if (line.tokensSize() > 0) {
-            return line.getToken(0);
+            return line.getToken(0).token;
         } else {
             return null;
         }
@@ -410,11 +429,13 @@ public class Interpreter {
      */
     private static boolean isParagraphHeaderFormat(CobolLine line, CobolLine nextLine) {
         if (getBeginningArea(line, true) == Area.A) {
-            if (line.tokensSize() == 1) {
+            if (line.tokensSize() == 1 ) {
                 if (line.getTrimmedString().endsWith(Constants.PERIOD) ||
                         (nextLine != null &&
                         nextLine.getTrimmedString().equals(Constants.PERIOD)))
                     return true;
+            } else if (line.tokensSize() > 1 && line.betweenTokens(0, 1, Constants.PERIOD)) {
+                return true;
             }
         }
         return false;
@@ -432,28 +453,28 @@ public class Interpreter {
             int usingIndex = line.getTokenIndexOf(Constants.USING_TOKEN);
             int i = usingIndex + 1;
             while (i < line.tokensSize()) {
-                if (line.getToken(i).toUpperCase(Locale.ROOT).equals(Constants.END_CALL_TOKEN) ||
-                    line.getToken(i).toUpperCase(Locale.ROOT).equals("ON"))
+                if (line.getToken(i).token.toUpperCase(Locale.ROOT).equals(Constants.END_CALL_TOKEN) ||
+                    line.getToken(i).token.toUpperCase(Locale.ROOT).equals("ON"))
                     break;
-                if (argumentReferences.contains(line.getToken(i).toUpperCase(Locale.ROOT))) {
-                    currentArgumentReference = line.getToken(i).toUpperCase();
+                if (argumentReferences.contains(line.getToken(i).token.toUpperCase(Locale.ROOT))) {
+                    currentArgumentReference = line.getToken(i).token.toUpperCase();
                     i++;
                     continue;
                 }
 
                 currentArgumentReference = currentArgumentReference.replace("BY ", "");
 
-                String newArgument = currentArgumentReference + SPACE + line.getToken(i);
+                String newArgument = currentArgumentReference + SPACE + line.getToken(i).token;
 
                 // if there is more tokens (2 or more), it may be a qualifier for the argument
                 int minimumTokensLeft = 2;
                 if (i < (line.tokensSize() - minimumTokensLeft)) {
                     // if 'next' token is a qualifier token, add this AND next (type? add here) token
-                    if (qualifyReference.contains(line.getToken(i + 1).toUpperCase(Locale.ROOT))) {
+                    if (qualifyReference.contains(line.getToken(i + 1).token.toUpperCase(Locale.ROOT))) {
                         // the token is qualified, add
                         newArgument = newArgument + SPACE +
-                                line.getToken(i + 1).toUpperCase() + SPACE +
-                                line.getToken(i + 2).toUpperCase();
+                                line.getToken(i + 1).token.toUpperCase() + SPACE +
+                                line.getToken(i + 2).token.toUpperCase();
                         i += 2;
                     }
                 }

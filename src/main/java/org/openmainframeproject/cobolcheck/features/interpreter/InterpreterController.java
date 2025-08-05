@@ -72,7 +72,7 @@ public class InterpreterController {
     }
 
     // Getters from reader
-    public List<String> getTokensForCurrentLine() {
+    public List<Token> getTokensForCurrentLine() {
         return reader.getCurrentLine().getTokens();
     }
 
@@ -138,6 +138,9 @@ public class InterpreterController {
     }
 
     public boolean shouldCurrentLineBeStubbed() throws IOException {
+        if (Interpreter.checkForPrintStatement(reader.getCurrentLine())) {
+            return true;
+        }
         if (reader.getState().isFlagSetFor(Constants.PROCEDURE_DIVISION)) {
             if (Interpreter.shouldLineBeStubbed(reader.getCurrentLine(), reader.getState())) {
                 if (!insideSectionOrParagraphMockBody && Interpreter.endsInPeriod(reader.getCurrentLine()))
@@ -332,7 +335,7 @@ public class InterpreterController {
         }
         if (didLineJustEnter(Constants.CALL_TOKEN)) {
             CobolLine statement = reader.readStatementAsOneLine();
-            possibleMockIdentifier = statement.getToken(statement.getTokenIndexOf(Constants.CALL_TOKEN) + 1);
+            possibleMockIdentifier = statement.getToken(statement.getTokenIndexOf(Constants.CALL_TOKEN) + 1).token;
             possibleMockType = Constants.CALL_TOKEN;
             possibleMockArgs = Interpreter.getUsingArgs(statement);
         }
@@ -378,7 +381,7 @@ public class InterpreterController {
      */
     private void updateNumericFields(CobolLine line) {
         if (line.tokensSize() > 1) {
-            String variableNameWeWantToSave = line.getToken(1);
+            String variableNameWeWantToSave = line.getToken(1).token;
 
             if (!this.currentDataStructure.isEmpty()) {
                 variableNameWeWantToSave = generateVariableNameBasedOnDataStructure(this.currentDataStructure);
@@ -391,10 +394,10 @@ public class InterpreterController {
                     numericFields.setDataTypeOf(variableNameWeWantToSave.toUpperCase(Locale.ROOT), DataType.BINARY);
                 } else {
                     int ix = 0;
-                    for (String token : line.getTokens()) {
-                        if (token.equalsIgnoreCase(Constants.PIC_VALUE)
-                                || (token.equalsIgnoreCase(Constants.PICTURE_VALUE))) {
-                            if (Interpreter.isInNumericFormat(line.getToken(ix + 1))) {
+                    for (Token token : line.getTokens()) {
+                        if (token.token.equalsIgnoreCase(Constants.PIC_VALUE)
+                                || (token.token.equalsIgnoreCase(Constants.PICTURE_VALUE))) {
+                            if (Interpreter.isInNumericFormat(line.getToken(ix + 1).token)) {
                                 numericFields.setDataTypeOf(variableNameWeWantToSave.toUpperCase(Locale.ROOT),
                                         DataType.DISPLAY_NUMERIC);
                             }
@@ -484,7 +487,7 @@ public class InterpreterController {
     private void updateLineRepoBySelectToken(CobolLine line) {
         if (line.containsToken(Constants.SELECT_TOKEN)) {
             if (line.tokensSize() > 1) {
-                lineRepository.addFileIdentifierWithNoStatus(line.getToken(1));
+                lineRepository.addFileIdentifierWithNoStatus(line.getToken(1).token);
             } else {
                 // First token on the next line should be the file identifier
                 String nextLineToken0 = peekNextMeaningfulLineAndGetTokenAtIndex0();
@@ -507,23 +510,23 @@ public class InterpreterController {
             if (Interpreter.isEndOfStatement(line, reader.peekNextMeaningfulLine())) {
                 // File status statement is on one line
                 if (line.tokensSize() > 2) {
-                    if (line.getToken(1).equalsIgnoreCase(Constants.IS_TOKEN)) {
-                        lineRepository.addStatusForLastSetIdentifier(line.getToken(2));
+                    if (line.getToken(1).token.equalsIgnoreCase(Constants.IS_TOKEN)) {
+                        lineRepository.addStatusForLastSetIdentifier(line.getToken(2).token);
                     }
                 } else if (line.tokensSize() > 1) {
                     if (!line.containsToken(Constants.IS_TOKEN)) {
-                        lineRepository.addStatusForLastSetIdentifier(line.getToken(1));
+                        lineRepository.addStatusForLastSetIdentifier(line.getToken(1).token);
                     }
                 }
             } else {
                 // File status statement is written across multiple lines
                 List<CobolLine> statement = reader.readTillEndOfStatement();
                 for (CobolLine l : statement) {
-                    List<String> tokens = l.getTokens();
-                    for (String token : tokens) {
-                        if (!token.equalsIgnoreCase(Constants.FILE_STATUS_TOKEN)
-                                && !token.equalsIgnoreCase(Constants.IS_TOKEN)) {
-                            lineRepository.addStatusForLastSetIdentifier(token);
+                    List<Token> tokens = l.getTokens();
+                    for (Token token : tokens) {
+                        if (!token.token.equalsIgnoreCase(Constants.FILE_STATUS_TOKEN)
+                                && !token.token.equalsIgnoreCase(Constants.IS_TOKEN)) {
+                            lineRepository.addStatusForLastSetIdentifier(token.token);
                         }
                     }
                 }
@@ -577,7 +580,7 @@ public class InterpreterController {
         }
 
         if (peekedLine != null && peekedLine.tokensSize() > 0) {
-            return peekedLine.getToken(0);
+            return peekedLine.getToken(0).token;
         } else {
             return null;
         }

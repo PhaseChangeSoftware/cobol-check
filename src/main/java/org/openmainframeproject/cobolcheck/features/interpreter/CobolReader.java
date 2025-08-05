@@ -217,7 +217,10 @@ public class CobolReader {
             if (line == null){
                 return null;
             }
-            CobolLine cobolLine = new CobolLine(line, tokenExtractor);
+            CobolLine cobolLine =
+             (line.length() > 72) ? new CobolLine(line.substring(0, 72), tokenExtractor) :
+                new CobolLine(line, tokenExtractor);
+
             nextLines.add(cobolLine);
             if (Interpreter.isMeaningful(cobolLine)){
                 return cobolLine;
