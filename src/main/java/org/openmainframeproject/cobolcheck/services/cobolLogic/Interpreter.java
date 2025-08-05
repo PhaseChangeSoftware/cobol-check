@@ -242,7 +242,7 @@ public class Interpreter {
     }
 
     public static boolean isMeaningful(CobolLine line) {
-        return line != null && !isEmpty(line) && !isComment(line) && !isTooShortToBeMeaningful(line);
+        return line != null && !isEmpty(line) && !isComment(line) && !isTooShortToBeMeaningful(line) && !checkForPrintStatement(line);
     }
 
     /**
@@ -334,9 +334,6 @@ public class Interpreter {
      * @return true if the source line should be commented out
      */
     public static boolean shouldLineBeReadAsStatement(CobolLine line, State state) {
-        if (checkForPrintStatement(line)) {
-            return false;
-        }
         if (state.isFlagSetFor(Constants.FILE_SECTION) || state.isFlagSetFor(Constants.FILE_CONTROL)) {
             if (line.containsToken(Constants.REPLACE_TOKEN))
                 return true;
