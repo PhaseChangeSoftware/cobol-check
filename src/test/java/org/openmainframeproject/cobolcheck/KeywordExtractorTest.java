@@ -9,13 +9,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KeywordExtractorTest {
 
     private KeywordExtractor extractor = new KeywordExtractor();
-    private List<String> tokens;
+    private List<Token> tokens;
 
     @Test
     public void given_three_tokens_with_no_leading_whitespace_it_finds_three_tokens() {
@@ -32,61 +33,61 @@ public class KeywordExtractorTest {
     @Test
     public void given_a_double_quoted_string_it_treats_the_string_as_a_single_token() {
         tokens = extractor.extractTokensFrom("\"A double quoted string\"");
-        assertEquals("\"A double quoted string\"", tokens.get(0));
+        assertEquals("\"A double quoted string\"", tokens.get(0).token);
         assertEquals(1, tokens.size());
     }
 
     @Test
     public void given_a_single_quoted_string_it_treats_the_string_as_a_single_token() {
         tokens = extractor.extractTokensFrom("\'A single quoted string\'");
-        assertEquals("\'A single quoted string\'", tokens.get(0));
+        assertEquals("\'A single quoted string\'", tokens.get(0).token);
         assertEquals(1, tokens.size());
     }
 
     @Test
     public void given_a_two_word_keyword_it_treats_the_keyword_as_a_single_token() {
         tokens = extractor.extractTokensFrom("TO BE OR NOT TO BE");
-        assertEquals("TO BE", tokens.get(0));
-        assertEquals("OR", tokens.get(1));
-        assertEquals("NOT", tokens.get(2));
-        assertEquals("TO BE", tokens.get(3));
+        assertEquals("TO BE", tokens.get(0).token);
+        assertEquals("OR", tokens.get(1).token);
+        assertEquals("NOT", tokens.get(2).token);
+        assertEquals("TO BE", tokens.get(3).token);
         assertEquals(4, tokens.size());
     }
     @Test
 
     public void parentheses_acts_as_seperator() {
         tokens = extractor.extractTokensFrom("VARIABLE(IDX) (START:LENGTH)");
-        assertEquals("VARIABLE", tokens.get(0));
-        assertEquals("(IDX)", tokens.get(1));
-        assertEquals("(START:LENGTH)", tokens.get(2));
+        assertEquals("VARIABLE", tokens.get(0).token);
+        assertEquals("(IDX)", tokens.get(1).token);
+        assertEquals("(START:LENGTH)", tokens.get(2).token);
         assertEquals(3, tokens.size());
     }
 
     @Test
     public void given_the_first_word_in_a_two_word_keyword_and_the_second_token_matches_the_expected_second_word_it_knows_it_is_not_a_match() {
         tokens = extractor.extractTokensFrom("TO BEST-WORLD");
-        assertEquals("TO", tokens.get(0));
-        assertEquals("BEST-WORLD", tokens.get(1));
+        assertEquals("TO", tokens.get(0).token);
+        assertEquals("BEST-WORLD", tokens.get(1).token);
         assertEquals(2, tokens.size());
     }
 
     @Test
     public void given_the_first_word_in_a_two_word_keyword_it_knows_the_second_word_is_not_a_match() {
         tokens = extractor.extractTokensFrom("TO WS-FIELDNAME");
-        assertEquals("TO", tokens.get(0));
-        assertEquals("WS-FIELDNAME", tokens.get(1));
+        assertEquals("TO", tokens.get(0).token);
+        assertEquals("WS-FIELDNAME", tokens.get(1).token);
         assertEquals(2, tokens.size());
     }
 
     @Test
     public void it_handles_multiword_keywords() {
         tokens = extractor.extractTokensFrom("TO BE BEFORE EACH NO MORE THAN TO WS-FIELDNAME BY CONTENT");
-        assertEquals("TO BE", tokens.get(0));
-        assertEquals("BEFORE EACH", tokens.get(1));
-        assertEquals("NO MORE THAN", tokens.get(2));
-        assertEquals("TO", tokens.get(3));
-        assertEquals("WS-FIELDNAME", tokens.get(4));
-        assertEquals("BY CONTENT", tokens.get(5));
+        assertEquals("TO BE", tokens.get(0).token);
+        assertEquals("BEFORE EACH", tokens.get(1).token);
+        assertEquals("NO MORE THAN", tokens.get(2).token);
+        assertEquals("TO", tokens.get(3).token);
+        assertEquals("WS-FIELDNAME", tokens.get(4).token);
+        assertEquals("BY CONTENT", tokens.get(5).token);
         assertEquals(6, tokens.size());
     }
 
@@ -96,7 +97,7 @@ public class KeywordExtractorTest {
             String sourceLine, int indexOfExpectedValue, String expectedValue, int numberOfTokens
     ) {
         tokens = extractor.extractTokensFrom(sourceLine);
-        assertEquals(expectedValue, tokens.get(indexOfExpectedValue));
+        assertEquals(expectedValue, tokens.get(indexOfExpectedValue).token);
         assertEquals(numberOfTokens, tokens.size());
     }
     private static Stream<Arguments> numericLiteralProvider() {
@@ -118,7 +119,7 @@ public class KeywordExtractorTest {
             String sourceLine, List<String> expectedTokens
     ) {
         tokens = extractor.extractTokensFrom(sourceLine);
-        assertEquals(expectedTokens, tokens);
+        assertEquals(expectedTokens, tokens.stream().map(k -> k.token).toList());
     }
     private static Stream<Arguments> fieldNameProvider() {
         return Stream.of(
@@ -136,7 +137,7 @@ public class KeywordExtractorTest {
     public void it_handles_symbolic_relations_keywords(
             String sourceLine, List<String> expectedTokens) {
         tokens = extractor.extractTokensFrom(sourceLine);
-        assertEquals(expectedTokens, tokens);
+        assertEquals(expectedTokens, tokens.stream().map(k -> k.token).toList());
     }
     private static Stream<Arguments> symbolicRelationsProvider() {
         return Stream.of(
@@ -158,14 +159,14 @@ public class KeywordExtractorTest {
     @Test
     public void given_a_mixture_of_different_types_of_tokens_it_extracts_them_correctly() {
         tokens = extractor.extractTokensFrom("  EXPECT WS-FOO TO BE \"something\"");
-        assertEquals("TO BE", tokens.get(2));
+        assertEquals("TO BE", tokens.get(2).token);
         assertEquals(4, tokens.size());
     }
 
     @Test
     public void it_removes_periods_used_as_statement_delimiters() {
         tokens = extractor.extractTokensFrom("           MOVE A TO B.");
-        assertEquals("B", tokens.get(3));
+        assertEquals("B", tokens.get(3).token);
     }
 
 }

@@ -2,6 +2,7 @@ package org.openmainframeproject.cobolcheck.features.testSuiteParser;
 
 import org.openmainframeproject.cobolcheck.services.Constants;
 import org.openmainframeproject.cobolcheck.services.StringHelper;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.TokenExtractor;
 
 import java.util.*;
@@ -35,8 +36,8 @@ public class KeywordExtractor implements TokenExtractor {
     }
 
     @Override
-    public List<String> extractTokensFrom(String sourceLine) {
-        List<String> tokens = new ArrayList<>();
+    public List<Token> extractTokensFrom(String sourceLine) {
+        List<Token> tokens = new ArrayList<>();
         buffer = new StringBuilder();
         int tokenOffset = 0;
         sourceLine = sourceLine.trim();
@@ -48,7 +49,7 @@ public class KeywordExtractor implements TokenExtractor {
                     if (currentCharacter == quoteDelimiter) {
                         openQuote = false;
                         buffer.append(currentCharacter);
-                        buffer = addTokenAndClearBuffer(buffer, tokens);
+                        buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
                     } else {
                         buffer.append(currentCharacter);
                     }
@@ -60,7 +61,7 @@ public class KeywordExtractor implements TokenExtractor {
             }
             else if (currentCharacter == '(' && !openQuote){
                 if (previousCharacter != SPACE){
-                    buffer = addTokenAndClearBuffer(buffer, tokens);
+                    buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
                 }
                 buffer.append(currentCharacter);
                 openParenthesis = true;
@@ -68,7 +69,7 @@ public class KeywordExtractor implements TokenExtractor {
             else if (currentCharacter == ')' && !openQuote){
                 openParenthesis = false;
                 buffer.append(currentCharacter);
-                buffer = addTokenAndClearBuffer(buffer, tokens);
+                buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
             }
             else if (openParenthesis && !openQuote)
                 buffer.append(currentCharacter);
@@ -99,12 +100,12 @@ public class KeywordExtractor implements TokenExtractor {
             tokenOffset += 1;
         }
         if (buffer.length() > 0) {
-            buffer = addTokenAndClearBuffer(buffer, tokens);
+            buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
         }
         return tokens;
     }
 
-    private int handleEndOfWord(String sourceLine, List<String> tokens, int tokenOffset) {
+    private int handleEndOfWord(String sourceLine, List<Token> tokens, int tokenOffset) {
         processingNumericLiteral = false;
         if (openQuote) {
             buffer.append(SPACE);
@@ -130,23 +131,23 @@ public class KeywordExtractor implements TokenExtractor {
 
                 }
                 buffer.deleteCharAt(buffer.length() - 1);
-                buffer = addTokenAndClearBuffer(buffer, tokens);
+                buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
                 nextExpectedTokens = new ArrayList<>();
             } else {
                 nextExpectedTokens = new ArrayList<>();
                 if (buffer.length() > 0) {
-                    buffer = addTokenAndClearBuffer(buffer, tokens);
+                    buffer = addTokenAndClearBuffer(buffer, tokenOffset, tokens);
                 }
             }
         }
         return tokenOffset;
     }
 
-    public boolean tokenListEndsDuringMultiToken(List<String> tokens){
+    public boolean tokenListEndsDuringMultiToken(List<Token> tokens){
         if (tokens == null || tokens.isEmpty())
             return false;
 
-        if (StringHelper.equalsAny(tokens.get(tokens.size() - 1), multiWordTokens.keySet()))
+        if (StringHelper.equalsAny(tokens.get(tokens.size() - 1).token, multiWordTokens.keySet()))
             return true;
 
         return false;
@@ -192,12 +193,12 @@ public class KeywordExtractor implements TokenExtractor {
         return previousCharacter;
     }
 
-    private StringBuilder addTokenAndClearBuffer(StringBuilder buffer, List<String> tokens) {
+    private StringBuilder addTokenAndClearBuffer(StringBuilder buffer, int tokenOffset, List<Token> tokens) {
         // this "if" is for a single case: a numeric literal is the last thing on a line and it's followed by a period.
         if (buffer.charAt(buffer.length()-1) == PERIOD) {
             buffer = new StringBuilder(buffer.substring(0, buffer.length()-1));
         }
-        tokens.add(buffer.toString().trim());
+        tokens.add(new Token(buffer.toString().trim(), tokenOffset));
         return new StringBuilder();
     }
 }

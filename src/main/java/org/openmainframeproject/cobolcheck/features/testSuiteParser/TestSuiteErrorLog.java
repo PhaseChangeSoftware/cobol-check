@@ -3,6 +3,7 @@ package org.openmainframeproject.cobolcheck.features.testSuiteParser;
 import org.openmainframeproject.cobolcheck.services.Config;
 import org.openmainframeproject.cobolcheck.services.Constants;
 import org.openmainframeproject.cobolcheck.services.Messages;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.TokenExtractor;
 import org.openmainframeproject.cobolcheck.services.filehelpers.EncodingIO;
 import org.openmainframeproject.cobolcheck.services.filehelpers.FilePermission;
@@ -89,16 +90,16 @@ public class TestSuiteErrorLog {
         int revertedCount = cobolLines.size();
         for (String line : cobolLines){
             if (line.indexOf('*') == 6) continue;
-            List<String> keywords = tokenExtractor.extractTokensFrom(line);
-            for(String keyword : keywords){
-                if (cobolCheckStartingAndEndingKeywords.contains(keyword.toUpperCase(Locale.ROOT))){
+            List<Token> keywords = tokenExtractor.extractTokensFrom(line);
+            for(Token keyword : keywords){
+                if (cobolCheckStartingAndEndingKeywords.contains(keyword.token.toUpperCase(Locale.ROOT))){
                     errorOccured = true;
                     String error = "";
                     lineNumber = lineNumber - revertedCount;
-                    int index = line.indexOf(keyword) + 1;
+                    int index = line.indexOf(keyword.token) + 1;
                     error += String.format(fileMessage, displayErrorType(ErrorTypes.SYNTAX_ERROR), currentFile) + ":" + lineNumber + ":" + index + ":" + Constants.NEWLINE;
                     error += String.format(lineIndexMessage, lineNumber, index) + Constants.NEWLINE;
-                    error += String.format(keywordInBlock, keyword, blockKeyword) + Constants.NEWLINE + Constants.NEWLINE;
+                    error += String.format(keywordInBlock, keyword.token, blockKeyword) + Constants.NEWLINE + Constants.NEWLINE;
                     outputError(error);
                 }
             }

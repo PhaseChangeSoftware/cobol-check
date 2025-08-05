@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.TransferQueue;
 
 /**
  * Parses the concatenated test suite and writes Cobol test code to the output
@@ -24,7 +23,7 @@ import java.util.concurrent.TransferQueue;
 public class TestSuiteParser {
     private final KeywordExtractor keywordExtractor;
     private TestSuiteWritingStyle testSuiteWritingStyle;
-    private List<String> testSuiteTokens;
+    private List<Token> testSuiteTokens;
     private HashMap<String, HashSet<String>> testNamesHierarchy;
     private String currentTestSuiteLine = "";
     private int fileLineNumber = 0;
@@ -797,7 +796,7 @@ public class TestSuiteParser {
                 }
             }
         }
-        String testSuiteToken = testSuiteTokens.get(0);
+        String testSuiteToken = testSuiteTokens.get(0).token;
         testSuiteTokens.remove(0);
         fileLineIndexNumber = currentTestSuiteLine.toUpperCase(Locale.ROOT)
                 .indexOf(testSuiteToken.toUpperCase(Locale.ROOT), fileLineIndexNumber) + 1;

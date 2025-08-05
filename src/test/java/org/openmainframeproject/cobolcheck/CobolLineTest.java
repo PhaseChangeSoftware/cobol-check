@@ -6,6 +6,7 @@ import org.openmainframeproject.cobolcheck.features.interpreter.State;
 import org.openmainframeproject.cobolcheck.features.interpreter.StringTokenizerExtractor;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.CobolLine;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.Interpreter;
+import org.openmainframeproject.cobolcheck.services.cobolLogic.Token;
 import org.openmainframeproject.cobolcheck.services.cobolLogic.TokenExtractor;
 
 import java.util.ArrayList;
@@ -32,7 +33,8 @@ public class CobolLineTest {
         String expectedOriginalString = originalLine;
         String expectedUnNumberedString = "       MOVE 6 TO WS-STORAGE";
         String expectedTrimmedString = "MOVE 6 TO WS-STORAGE";
-        List<String> expectedTokens = Arrays.asList("MOVE", "6", "TO", "WS-STORAGE");
+        List<Token> expectedTokens = Arrays.asList(new Token("MOVE", 11), new Token("6", 13),
+            new Token("TO", 16), new Token("WS-STORAGE", 27));
 
         CobolLine line = new CobolLine(originalLine, tokenExtractor);
         assertEquals(line.getOriginalString(), expectedOriginalString);
@@ -48,7 +50,8 @@ public class CobolLineTest {
         String expectedOriginalString = originalLine;
         String expectedUnNumberedString = originalLine;
         String expectedTrimmedString = "MOVE 6 TO WS-STORAGE";
-        List<String> expectedTokens = Arrays.asList("MOVE", "6", "TO", "WS-STORAGE");
+        List<Token> expectedTokens = Arrays.asList(new Token("MOVE", 11), new Token("6", 13),
+            new Token("TO", 16), new Token("WS-STORAGE", 27));
 
         CobolLine line = new CobolLine(originalLine, tokenExtractor);
         assertEquals(line.getOriginalString(), expectedOriginalString);

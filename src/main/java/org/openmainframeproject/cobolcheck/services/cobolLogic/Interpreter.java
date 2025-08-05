@@ -173,13 +173,13 @@ public class Interpreter {
             return false;
         }
         if (currentLine.containsToken(Constants.CALL_TOKEN)) {
-            List<String> currentTokens = currentLine.getTokens();
+            List<Token> currentTokens = currentLine.getTokens();
             int callTokenCount = 0, endCallTokenCount = 0;
-            for (String token : currentTokens) {
-                if (token.equals(Constants.CALL_TOKEN)) {
+            for (Token token : currentTokens) {
+                if (token.token.equals(Constants.CALL_TOKEN)) {
                     callTokenCount++;
                 }
-                if (token.equals(Constants.END_CALL_TOKEN)) {
+                if (token.token.equals(Constants.END_CALL_TOKEN)) {
                     endCallTokenCount++;
                 }
             }
@@ -193,7 +193,7 @@ public class Interpreter {
                 return false;
             }
         }
-        if (CobolVerbs.isStartOrEndCobolVerb(nextMeaningfulLine.getTokens().get(0))) {
+        if (CobolVerbs.isStartOrEndCobolVerb(nextMeaningfulLine.getTokens().get(0).token)) {
             if(wholeWordSearch(currentLine.getTrimmedString(), "JOIN") && nextMeaningfulLine.getTrimmedString().startsWith("ON")){
                 return false;
             }
@@ -364,13 +364,13 @@ public class Interpreter {
         return false;
     }
 
-    private static boolean isBatchFileIOStatement(List<String> tokens, String ioVerb) {
-        return tokens.contains(ioVerb);
+    private static boolean isBatchFileIOStatement(List<Token> tokens, String ioVerb) {
+        return tokens.stream().anyMatch(k -> k.token.equals(ioVerb));
     }
 
     public static String getSectionOrParagraphName(CobolLine line) {
         if (line.tokensSize() > 0) {
-            return line.getToken(0);
+            return line.getToken(0).token;
         } else {
             return null;
         }
@@ -410,11 +410,13 @@ public class Interpreter {
      */
     private static boolean isParagraphHeaderFormat(CobolLine line, CobolLine nextLine) {
         if (getBeginningArea(line, true) == Area.A) {
-            if (line.tokensSize() == 1) {
+            if (line.tokensSize() == 1 ) {
                 if (line.getTrimmedString().endsWith(Constants.PERIOD) ||
                         (nextLine != null &&
                         nextLine.getTrimmedString().equals(Constants.PERIOD)))
                     return true;
+            } else if (line.tokensSize() > 1 && line.betweenTokens(0, 1, Constants.PERIOD)) {
+                return true;
             }
         }
         return false;
@@ -432,28 +434,28 @@ public class Interpreter {
             int usingIndex = line.getTokenIndexOf(Constants.USING_TOKEN);
             int i = usingIndex + 1;
             while (i < line.tokensSize()) {
-                if (line.getToken(i).toUpperCase(Locale.ROOT).equals(Constants.END_CALL_TOKEN) ||
-                    line.getToken(i).toUpperCase(Locale.ROOT).equals("ON"))
+                if (line.getToken(i).token.toUpperCase(Locale.ROOT).equals(Constants.END_CALL_TOKEN) ||
+                    line.getToken(i).token.toUpperCase(Locale.ROOT).equals("ON"))
                     break;
-                if (argumentReferences.contains(line.getToken(i).toUpperCase(Locale.ROOT))) {
-                    currentArgumentReference = line.getToken(i).toUpperCase();
+                if (argumentReferences.contains(line.getToken(i).token.toUpperCase(Locale.ROOT))) {
+                    currentArgumentReference = line.getToken(i).token.toUpperCase();
                     i++;
                     continue;
                 }
 
                 currentArgumentReference = currentArgumentReference.replace("BY ", "");
 
-                String newArgument = currentArgumentReference + SPACE + line.getToken(i);
+                String newArgument = currentArgumentReference + SPACE + line.getToken(i).token;
 
                 // if there is more tokens (2 or more), it may be a qualifier for the argument
                 int minimumTokensLeft = 2;
                 if (i < (line.tokensSize() - minimumTokensLeft)) {
                     // if 'next' token is a qualifier token, add this AND next (type? add here) token
-                    if (qualifyReference.contains(line.getToken(i + 1).toUpperCase(Locale.ROOT))) {
+                    if (qualifyReference.contains(line.getToken(i + 1).token.toUpperCase(Locale.ROOT))) {
                         // the token is qualified, add
                         newArgument = newArgument + SPACE +
-                                line.getToken(i + 1).toUpperCase() + SPACE +
-                                line.getToken(i + 2).toUpperCase();
+                                line.getToken(i + 1).token.toUpperCase() + SPACE +
+                                line.getToken(i + 2).token.toUpperCase();
                         i += 2;
                     }
                 }

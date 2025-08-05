@@ -11,7 +11,7 @@ public class CobolLine {
     private String originalString;
     private String unNumberedString;
     private String trimmedString;
-    private List<String> tokens;
+    private List<Token> tokens;
 
     public CobolLine(String line, TokenExtractor tokenExtractor){
         originalString = line;
@@ -24,10 +24,12 @@ public class CobolLine {
     public String getOriginalString() { return originalString; }
     public String getUnNumberedString() { return unNumberedString; }
     public String getTrimmedString() { return trimmedString; }
-    public List<String> getTokens() {
+    public List<Token> getTokens() {
         return tokens;
     }
-    public String getToken(int index) { return tokens.get(index); }
+    public Token getToken(int index) {
+        return tokens.get(index);
+    }
 
     public int tokensSize() { return tokens.size(); }
 
@@ -40,7 +42,8 @@ public class CobolLine {
      * @return (boolean) true if this line contains the token
      */
     public boolean containsToken(String tokenValue) {
-        return tokens.size() > 0 && tokens.contains(tokenValue.toUpperCase(Locale.ROOT));
+        return !tokens.isEmpty() && tokens.stream()
+            .anyMatch(k -> k.token.toUpperCase(Locale.ROOT).equals(tokenValue.toUpperCase(Locale.ROOT)));
     }
 
     /**
@@ -89,7 +92,7 @@ public class CobolLine {
      */
     public int getTokenIndexOf(String tokenValue) {
         for (int i = 0; i < tokens.size(); i++){
-            if (tokens.get(i).equals(tokenValue.toUpperCase(Locale.ROOT)))
+            if (tokens.get(i).token.equals(tokenValue.toUpperCase(Locale.ROOT)))
                 return i;
         }
         return -1;
@@ -104,7 +107,7 @@ public class CobolLine {
      * @return (boolean) true if this line ends with the token
      */
     public boolean endsWithToken(String tokenValue) {
-        return tokens.size() > 0 && tokens.get(tokensSize() - 1) == tokenValue.toUpperCase(Locale.ROOT);
+        return !tokens.isEmpty() && tokens.get(tokensSize() - 1).token.equals(tokenValue.toUpperCase(Locale.ROOT));
     }
 
     private String removeSequenceNumberArea(String originalLine){
@@ -136,5 +139,20 @@ public class CobolLine {
         }
         TokenExtractor tokenExtractor = new StringTokenizerExtractor();
         return new CobolLine(line, tokenExtractor);
+    }
+
+    public boolean betweenTokens(int first, int next, String character) {
+        int index = getToken(first).offset;
+        if (index == -1) {
+            return false;
+        }
+        int nextIndex = getToken(next).offset;
+        if (nextIndex == -1) {
+            return false;
+        }
+        if (originalString.substring(index, nextIndex).contains(character)) {
+            return true;
+        }
+        return false;
     }
 }
