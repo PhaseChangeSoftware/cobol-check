@@ -22,6 +22,10 @@ public class Interpreter {
         "OPEN", "CLOSE", "READ", "WRITE", "REWRITE", "DELETE", "START"
     );
 
+    private static final List<String> pageVerbs = Arrays.asList(
+        "EJECT"
+    );
+
     // Used for handling source lines from copybooks that may not have the standard 80-byte length
     private static final int minimumMeaningfulSourceLineLength = 7;
     private static final int commentIndicatorOffset = 6;
@@ -281,8 +285,10 @@ public class Interpreter {
      */
     public static boolean shouldLineBeStubbed(CobolLine line, State state) {
         if (state.isFlagSetFor(Constants.PROCEDURE_DIVISION)) {
-            if (checkForBatchFileIOStatement(line) || line.containsToken(Constants.CALL_TOKEN) ||
-                    line.containsToken(Constants.EXEC_SQL_TOKEN) || line.containsToken(Constants.EXEC_CICS_TOKEN) || line.containsToken(Constants.END_EXEC_TOKEN)) {
+            if (checkForBatchFileIOStatement(line) ||
+                line.containsToken(Constants.CALL_TOKEN) ||
+                    line.containsToken(Constants.EXEC_SQL_TOKEN) || line.containsToken(Constants.EXEC_CICS_TOKEN) ||
+                line.containsToken(Constants.END_EXEC_TOKEN)) {
                 return true;
             }
         }
@@ -328,6 +334,9 @@ public class Interpreter {
      * @return true if the source line should be commented out
      */
     public static boolean shouldLineBeReadAsStatement(CobolLine line, State state) {
+        if (checkForPrintStatement(line)) {
+            return false;
+        }
         if (state.isFlagSetFor(Constants.FILE_SECTION) || state.isFlagSetFor(Constants.FILE_CONTROL)) {
             if (line.containsToken(Constants.REPLACE_TOKEN))
                 return true;
@@ -357,15 +366,28 @@ public class Interpreter {
      */
     public static boolean checkForBatchFileIOStatement(CobolLine line) {
         for (String ioVerb : batchFileIOVerbs) {
-            if (isBatchFileIOStatement(line.getTokens(), ioVerb)) {
+            if (isVerbStatement(line.getTokens(), ioVerb)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean isBatchFileIOStatement(List<Token> tokens, String ioVerb) {
+    private static boolean isVerbStatement(List<Token> tokens, String ioVerb) {
         return tokens.stream().anyMatch(k -> k.token.equals(ioVerb));
+    }
+
+    /**
+     * @param line
+     * @return true if the source line contains a batch file IO verb
+     */
+    public static boolean checkForPrintStatement(CobolLine line) {
+        for (String ioVerb : pageVerbs) {
+            if (isVerbStatement(line.getTokens(), ioVerb)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String getSectionOrParagraphName(CobolLine line) {

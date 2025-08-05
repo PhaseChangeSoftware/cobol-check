@@ -138,6 +138,9 @@ public class InterpreterController {
     }
 
     public boolean shouldCurrentLineBeStubbed() throws IOException {
+        if (Interpreter.checkForPrintStatement(reader.getCurrentLine())) {
+            return true;
+        }
         if (reader.getState().isFlagSetFor(Constants.PROCEDURE_DIVISION)) {
             if (Interpreter.shouldLineBeStubbed(reader.getCurrentLine(), reader.getState())) {
                 if (!insideSectionOrParagraphMockBody && Interpreter.endsInPeriod(reader.getCurrentLine()))
