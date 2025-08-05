@@ -82,6 +82,7 @@ abstract class AbstractAstVisitor : AstVisitor {
     }
 
     override fun visit(step: GherkinStep) {
+        step.tags?.also {visit(it)}
         visit(step.stepLine)
         step.stepArg?.also { visit(it) }
     }
