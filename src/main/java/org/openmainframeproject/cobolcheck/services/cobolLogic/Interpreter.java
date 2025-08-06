@@ -23,7 +23,7 @@ public class Interpreter {
     );
 
     private static final List<String> pageVerbs = Arrays.asList(
-        "EJECT"
+        "EGYPT"
     );
 
     // Used for handling source lines from copybooks that may not have the standard 80-byte length

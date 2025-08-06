@@ -305,10 +305,10 @@ WBC****    ************************************************************ 00002010
 006990                                                                  00006990
 007000 2200-READ-IN.                                                    00007000
 007010     READ REJECT-IN-FILE INTO REJECTED-TRANSACTION-RECORD         00007010
-007020                     AT END MOVE 'COMPLETE' TO WS-FILE-IND        00007020
-007030                            CLOSE REJECT-IN-FILE                  00007030
-007040                            CLOSE REFUND-OUT-FILE                 00007040
-007050                            GO TO 2200-EXIT.                      00007050
+007020*                    AT END MOVE 'COMPLETE' TO WS-FILE-IND        00007020
+007030*                           CLOSE REJECT-IN-FILE                  00007030
+007040*                           CLOSE REFUND-OUT-FILE                 00007040
+007050*                           GO TO 2200-EXIT.                      00007050
 007060     ADD 1 TO REF-IN-CNT.                                         00007060
 007070     ADD REFTRAN-CHG-AMT TO REF-IN-AMT.                           00007070
 007080     MOVE SPACES TO WS-ERR-IND.                                   00007080

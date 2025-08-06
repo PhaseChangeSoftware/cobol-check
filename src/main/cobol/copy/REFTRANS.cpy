@@ -32,8 +32,8 @@
                    88 REFTRAN-INVALID-CODE       VALUE 9.
             05  REFTRAN-RETAILER-INFO.
                 10 REFTRAN-RET-KEY.
-                      05 REFTRAN-RET-KEY-BASE       PIC 9(20).
-                      05 REFTRAN-RET-KEY-SEQ        PIC 9(2).
+                      15 REFTRAN-RET-KEY-BASE       PIC 9(20).
+                      15 REFTRAN-RET-KEY-SEQ        PIC 9(2).
                 10 REFTRAN-NAME           PIC X(20).
                 10 REFTRAN-ADDR1          PIC X(30).
                 10 REFTRAN-ADDR2          PIC X(30).

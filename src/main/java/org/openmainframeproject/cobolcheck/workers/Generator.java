@@ -186,8 +186,9 @@ public class Generator {
                 if (interpreter.shouldCurrentLineBeStubbed()) {
                     if(interpreter.isReading(Constants.WORKING_STORAGE_SECTION)) {
                         writerController.writeStubbedLine(interpreter.getCurrentLineAsStatement().getUnNumberedString());
-                        if (!interpreter.getFileSectionStatements().isEmpty())
+                        if (!interpreter.getFileSectionStatements().isEmpty() && !testSuiteParserController.hasWorkingStorageTestCodeBeenInserted()) {
                             writerController.writeLines(interpreter.getFileSectionStatements());
+                        }
                     }
                     else 
                         writerController.writeStubbedLine(sourceLine);

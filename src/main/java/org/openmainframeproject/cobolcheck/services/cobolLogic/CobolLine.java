@@ -129,6 +129,10 @@ public class CobolLine {
             int index = line.indexOf(trailingComment);
             return line.substring(0, index);
         }
+        if (line.contains(" EJECT ")) {
+            int index = line.indexOf("EJECT");
+            return line.substring(0, index);
+        }
         return line;
     }
 
